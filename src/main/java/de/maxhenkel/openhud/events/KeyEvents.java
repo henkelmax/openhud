@@ -2,6 +2,7 @@ package de.maxhenkel.openhud.events;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import de.maxhenkel.openhud.Main;
+import de.maxhenkel.openhud.screen.WaypointScreen;
 import de.maxhenkel.openhud.screen.WaypointsScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -20,14 +21,16 @@ public class KeyEvents {
 
     public static KeyMapping HIDE_HUD;
     public static KeyMapping WAYPOINTS;
-    public static KeyMapping TEST;
+    public static KeyMapping CREATE_WAYPOINT;
 
     @OnlyIn(Dist.CLIENT)
     public static void onRegisterKeyBinds(RegisterKeyMappingsEvent event) {
-        HIDE_HUD = new KeyMapping("key.hide_hud", InputConstants.UNKNOWN.getValue(), "key.categories.misc");
+        HIDE_HUD = new KeyMapping("key.openhud.hide_hud", InputConstants.UNKNOWN.getValue(), "key.categories.misc");
         event.register(HIDE_HUD);
-        WAYPOINTS = new KeyMapping("key.waypoints", GLFW.GLFW_KEY_M, "key.categories.misc");
+        WAYPOINTS = new KeyMapping("key.openhud.waypoints", GLFW.GLFW_KEY_M, "key.categories.misc");
         event.register(WAYPOINTS);
+        CREATE_WAYPOINT = new KeyMapping("key.openhud.create_waypoint", InputConstants.UNKNOWN.getValue(), "key.categories.misc");
+        event.register(CREATE_WAYPOINT);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -38,6 +41,9 @@ public class KeyEvents {
         }
         if (WAYPOINTS.consumeClick()) {
             mc.setScreen(new WaypointsScreen(mc.screen));
+        }
+        if (CREATE_WAYPOINT.consumeClick()) {
+            mc.setScreen(new WaypointScreen(mc.screen, null));
         }
     }
 

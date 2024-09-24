@@ -1,6 +1,7 @@
 {
-  "key.waypoints": "Manage waypoints",
-  "key.hide_hud": "Hide HUD",
+  "key.openhud.waypoints": "Manage Waypoints",
+  "key.openhud.hide_hud": "Hide HUD",
+  "key.openhud.create_waypoint": "Create Waypoint",
   "message.openhud.radar.south": "S",
   "message.openhud.radar.west": "W",
   "message.openhud.radar.north": "N",
