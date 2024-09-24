@@ -15,10 +15,14 @@ import java.util.UUID;
 public class Waypoint {
 
     public static final Codec<Waypoint> CODEC = RecordCodecBuilder.create(instance -> {
-        return instance.group(UUIDUtil.CODEC.fieldOf("id").forGetter(Waypoint::getId),
+        return instance.group(
+                UUIDUtil.CODEC.fieldOf("id").forGetter(Waypoint::getId),
                 BlockPos.CODEC.fieldOf("position").forGetter(Waypoint::getPosition),
                 ComponentSerialization.CODEC.fieldOf("name").forGetter(Waypoint::getName),
-                Codec.INT.fieldOf("color").forGetter(Waypoint::getColor)).apply(instance, Waypoint::new);
+                Codec.INT.fieldOf("color").forGetter(Waypoint::getColor),
+                Codec.BOOL.fieldOf("visible").forGetter(Waypoint::isVisible)
+
+        ).apply(instance, Waypoint::new);
     });
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Waypoint> STREAM_CODEC = StreamCodec.composite(
@@ -30,6 +34,8 @@ public class Waypoint {
             Waypoint::getName,
             ByteBufCodecs.INT,
             Waypoint::getColor,
+            ByteBufCodecs.BOOL,
+            Waypoint::isVisible,
             Waypoint::new
     );
 
@@ -37,12 +43,14 @@ public class Waypoint {
     protected BlockPos position;
     protected Component name;
     protected int color;
+    protected boolean visible;
 
-    public Waypoint(UUID id, BlockPos position, Component name, int color) {
+    public Waypoint(UUID id, BlockPos position, Component name, int color, boolean visible) {
         this.id = id;
         this.position = position;
         this.name = name;
         this.color = color;
+        this.visible = visible;
     }
 
     public UUID getId() {
@@ -71,5 +79,13 @@ public class Waypoint {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

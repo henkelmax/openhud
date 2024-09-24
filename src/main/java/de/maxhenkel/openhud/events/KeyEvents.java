@@ -2,7 +2,9 @@ package de.maxhenkel.openhud.events;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import de.maxhenkel.openhud.Main;
+import de.maxhenkel.openhud.screen.WaypointsScreen;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,8 +16,11 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber
 public class KeyEvents {
 
+    private static final Minecraft mc = Minecraft.getInstance();
+
     public static KeyMapping HIDE_HUD;
     public static KeyMapping WAYPOINTS;
+    public static KeyMapping TEST;
 
     @OnlyIn(Dist.CLIENT)
     public static void onRegisterKeyBinds(RegisterKeyMappingsEvent event) {
@@ -30,6 +35,9 @@ public class KeyEvents {
     public static void onKeyInput(InputEvent.Key event) {
         if (HIDE_HUD.consumeClick()) {
             Main.CLIENT_CONFIG.hideHud.set(!Main.CLIENT_CONFIG.hideHud.get());
+        }
+        if (WAYPOINTS.consumeClick()) {
+            mc.setScreen(new WaypointsScreen(mc.screen));
         }
     }
 

@@ -81,6 +81,9 @@ public class RadarRenderer {
 
         Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition();
         for (Waypoint waypoint : WaypointClientManager.getWaypoints().getWaypoints()) {
+            if (!waypoint.isVisible()) {
+                continue;
+            }
             float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, worldPosition.x, worldPosition.z));
             drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint, worldPosition);
         }

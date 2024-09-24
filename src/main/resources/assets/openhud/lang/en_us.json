@@ -4,5 +4,10 @@
   "message.openhud.radar.south": "S",
   "message.openhud.radar.west": "W",
   "message.openhud.radar.north": "N",
-  "message.openhud.radar.east": "E"
+  "message.openhud.radar.east": "E",
+  "message.openhud.back": "Back",
+  "message.openhud.edit": "Edit",
+  "message.openhud.coordinates": "%s, %s, %s",
+  "message.openhud.distance": "%s blocks away",
+  "gui.openhud.waypoints.title": "Waypoints"
 }
