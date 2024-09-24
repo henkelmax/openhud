@@ -1,0 +1,18 @@
+plugins {
+    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
+    id 'net.neoforged.gradle.mixin' version "${neogradle_mixin_version}"
+    id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
+    id 'com.modrinth.minotaur' version "${minotaur_version}"
+    id 'com.github.johnrengelman.shadow' version "${shadow_version}"
+    id 'mod-update' version "${mod_update_version}"
+}
+
+apply from: "https://raw.githubusercontent.com/henkelmax/mod-gradle-scripts/${mod_gradle_script_version}/mod.gradle"
+
+processResources {
+    filesMatching('**/*.toml') {
+        expand 'mod_version': mod_version,
+                'neoforge_dependency': neoforge_dependency,
+                'minecraft_version': minecraft_version
+    }
+}

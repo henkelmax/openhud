@@ -1,0 +1,25 @@
+modLoader = "javafml"
+loaderVersion = "*"
+license = "LGPL-3.0-or-later"
+issueTrackerURL = "https://github.com/henkelmax/openhud/issues"
+[[mods]]
+modId = "openhud"
+version = "${mod_version}"
+displayName = "OpenHUD"
+updateJSONURL = "https://update.maxhenkel.de/neoforge/openhud"
+displayURL = "https://modrinth.com/mod/openhud"
+#logoFile = "icon.png"
+authors = "Max Henkel"
+description = '''An open source solution for displaying waypoints'''
+[[dependencies.openhud]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_dependency}"
+ordering = "NONE"
+side = "BOTH"
+[[dependencies.openhud]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21,1.21.1]"
+ordering = "NONE"
+side = "BOTH"
