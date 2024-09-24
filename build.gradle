@@ -16,3 +16,9 @@ processResources {
                 'minecraft_version': minecraft_version
     }
 }
+
+runs {
+    client {
+        arguments = ['--username', 'henkelmax']
+    }
+}
