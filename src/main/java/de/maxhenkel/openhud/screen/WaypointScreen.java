@@ -81,8 +81,8 @@ public class WaypointScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        if (parent instanceof WaypointsScreen waypointsScreen) {
-            waypointsScreen.update();
+        if (parent instanceof UpdatableScreen updatableScreen) {
+            updatableScreen.update();
         }
         minecraft.setScreen(parent);
     }

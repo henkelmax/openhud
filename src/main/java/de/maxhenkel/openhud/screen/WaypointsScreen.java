@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
 
-public class WaypointsScreen extends Screen {
+public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     private static final Component TITLE = Component.translatable("gui.openhud.waypoints.title");
     private static final Component BACK = Component.translatable("message.openhud.back");
@@ -81,6 +81,7 @@ public class WaypointsScreen extends Screen {
         PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
     }
 
+    @Override
     public void update() {
         waypointList.updateEntries();
     }
