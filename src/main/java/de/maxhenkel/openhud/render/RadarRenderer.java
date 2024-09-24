@@ -1,12 +1,11 @@
 package de.maxhenkel.openhud.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import de.maxhenkel.openhud.Main;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
@@ -26,7 +25,7 @@ public class RadarRenderer {
     public static final int LINE_HEIGHT = 6;
     public static final int SHORT_LINE_HEIGHT = 3;
 
-    public static void render(GuiGraphics guiGraphics) {
+    public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (mc.player == null) {
             return;
         }
@@ -99,16 +98,16 @@ public class RadarRenderer {
             return;
         }
         float posX = hudX + (hudWidth - 1F) * perc + 1F;
-        drawGenericMarker(guiGraphics, posX, hudY + GENERIC_MARKER_SIZE / 2F + 1F, color);
-    }
+        float posY = hudY + hudHeight / 2F;
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(posX, posY, 0F);
 
-    private static void drawGenericMarker(GuiGraphics guiGraphics, float x, float y, int color) {
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         float markerSize = GENERIC_MARKER_SIZE;
         float texPos = (float) GENERIC_MARKER_SIZE / (float) GENERIC_MARKER_TEXTURE_SIZE;
-        GraphicsUtils.blitColored(guiGraphics, GENERIC_MARKER, x - markerSize / 2, x + markerSize / 2, y - markerSize / 2, y + markerSize / 2, 0F, texPos, 0F, texPos, color);
-        GraphicsUtils.blit(guiGraphics, GENERIC_MARKER_OVERLAY, x - markerSize / 2, x + markerSize / 2, y - markerSize / 2, y + markerSize / 2, 0F, texPos, 0F, texPos);
+        GraphicsUtils.blitColored(guiGraphics, GENERIC_MARKER, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, texPos, 0F, texPos, color);
+        GraphicsUtils.blit(guiGraphics, GENERIC_MARKER_OVERLAY, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, texPos, 0F, texPos);
+
+        guiGraphics.pose().popPose();
     }
 
     /**

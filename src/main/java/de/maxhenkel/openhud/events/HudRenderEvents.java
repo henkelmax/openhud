@@ -18,7 +18,7 @@ public class HudRenderEvents {
         if (Main.CLIENT_CONFIG.hideHud.get()) {
             return;
         }
-        RadarRenderer.render(event.getGuiGraphics());
+        RadarRenderer.render(event.getGuiGraphics(), event.getPartialTick());
     }
 
 }
