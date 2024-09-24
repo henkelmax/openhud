@@ -67,12 +67,12 @@ public class RadarRenderer {
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southeast);
         }
 
-        Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
-        double cameraX = cameraPos.x;
-        double cameraZ = cameraPos.z;
+        Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition();
+        double positionX = worldPosition.x;
+        double positionZ = worldPosition.z;
         for (Waypoint waypoint : WaypointClientManager.getWaypoints().getWaypoints()) {
-            float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, cameraX, cameraZ));
-            drawGenericMarker(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint.getColor());
+            float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, positionX, positionZ));
+            drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint);
         }
     }
 
@@ -93,7 +93,7 @@ public class RadarRenderer {
         guiGraphics.drawString(mc.font, str, posX - stringWidth / 2F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
     }
 
-    private static void drawGenericMarker(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, int color) {
+    private static void drawWaypoint(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, Waypoint waypoint) {
         if (perc < 0F || perc > 1F) {
             return;
         }
@@ -101,13 +101,18 @@ public class RadarRenderer {
         float posY = hudY + hudHeight / 2F;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(posX, posY, 0F);
+        
+        //TODO Check if marker has custom icon
+        drawColorMarker(guiGraphics, waypoint.getColor());
 
+        guiGraphics.pose().popPose();
+    }
+
+    private static void drawColorMarker(GuiGraphics guiGraphics, int color) {
         float markerSize = GENERIC_MARKER_SIZE;
         float texPos = (float) GENERIC_MARKER_SIZE / (float) GENERIC_MARKER_TEXTURE_SIZE;
         GraphicsUtils.blitColored(guiGraphics, GENERIC_MARKER, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, texPos, 0F, texPos, color);
         GraphicsUtils.blit(guiGraphics, GENERIC_MARKER_OVERLAY, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, texPos, 0F, texPos);
-
-        guiGraphics.pose().popPose();
     }
 
     /**
