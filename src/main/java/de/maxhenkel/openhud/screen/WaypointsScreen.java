@@ -32,7 +32,7 @@ public class WaypointsScreen extends Screen {
     protected Button backButton;
 
     public WaypointsScreen(@Nullable Screen parent) {
-        super(Component.empty());
+        super(TITLE);
         this.parent = parent;
     }
 
