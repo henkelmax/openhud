@@ -1,26 +1,30 @@
 package de.maxhenkel.openhud.render;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import de.maxhenkel.openhud.Main;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 
 public class RadarRenderer {
 
     private static final Minecraft mc = Minecraft.getInstance();
 
+    public static final ResourceLocation GENERIC_MARKER = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker.png");
+    public static final ResourceLocation GENERIC_MARKER_OVERLAY = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker_overlay.png");
+    public static final int GENERIC_MARKER_SIZE = 6;
+    public static final int GENERIC_MARKER_TEXTURE_SIZE = 8;
+
     public static final int HUD_FILL_COLOR = FastColor.ARGB32.colorFromFloat(0.25F, 0F, 0F, 0F);
-    public static final int DIRECTION_MARKER_COLOR = FastColor.ARGB32.colorFromFloat(0.5F, 1F, 1F, 1F);
     public static final int PADDING = 10;
     public static final int BOX_INNER_HORIZONTAL_PADDING = 2;
     public static final int LINE_HEIGHT = 6;
     public static final int SHORT_LINE_HEIGHT = 3;
-    public static final float FOV = 180F;
 
     public static void render(GuiGraphics guiGraphics) {
         if (mc.player == null) {
@@ -41,48 +45,36 @@ public class RadarRenderer {
         int contentWidth = hudWidth - BOX_INNER_HORIZONTAL_PADDING * 2;
         int contentHeight = hudHeight;
 
-        float south = calculateDirection(0F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, south);
-        drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, south, "S");
-        float southwest = calculateDirection(45F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southwest);
-        float west = calculateDirection(90F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, west);
-        drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, west, "W");
-        float northwest = calculateDirection(135F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northwest);
-        float north = calculateDirection(180F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, north);
-        drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, north, "N");
-        float northeast = calculateDirection(225F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northeast);
-        float east = calculateDirection(-90F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, east);
-        drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, east, "E");
-        float southeast = calculateDirection(315F);
-        drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southeast);
+        if (Main.CLIENT_CONFIG.renderCardinalDirections.get()) {
+            float south = calculateHudPosition(0F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, south);
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, south, "S");
+            float southwest = calculateHudPosition(45F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southwest);
+            float west = calculateHudPosition(90F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, west);
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, west, "W");
+            float northwest = calculateHudPosition(135F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northwest);
+            float north = calculateHudPosition(180F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, north);
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, north, "N");
+            float northeast = calculateHudPosition(225F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northeast);
+            float east = calculateHudPosition(-90F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, east);
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, east, "E");
+            float southeast = calculateHudPosition(315F);
+            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southeast);
+        }
 
         Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
         double cameraX = cameraPos.x;
         double cameraZ = cameraPos.z;
         for (Waypoint waypoint : WaypointClientManager.getWaypoints().getWaypoints()) {
-            float waypointPos = calculateDirection(getWaypointAngle(waypoint, cameraX, cameraZ));
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, waypointPos);
-            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, "X");
+            float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, cameraX, cameraZ));
+            drawGenericMarker(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint.getColor());
         }
-    }
-
-    public static float getWaypointAngle(Waypoint waypoint, double cameraX, double cameraZ) {
-        double waypointX = waypoint.getPosition().getX() + 0.5D;
-        double waypointZ = waypoint.getPosition().getZ() + 0.5D;
-        // Calculate dx and dz
-        double dx = waypointX - cameraX;
-        double dz = waypointZ - cameraZ;
-        // Calculate the angle in radians
-        double angleInRadians = Math.atan2(dx, dz);
-
-        // Normalize the angle to range [0, 360)
-        return (float) ((-Math.toDegrees(angleInRadians) + 360D) % 360D);
     }
 
     private static void drawLine(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float lineHeight, float perc) {
@@ -90,7 +82,7 @@ public class RadarRenderer {
             return;
         }
         float posX = hudX + (hudWidth - 1F) * perc;
-        fill(guiGraphics, posX, hudY, posX + 1F, hudY + lineHeight, DIRECTION_MARKER_COLOR);
+        GraphicsUtils.fill(guiGraphics, posX, hudY, posX + 1F, hudY + lineHeight, Main.CLIENT_CONFIG.lineColor.get());
     }
 
     private static void drawString(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, String str) {
@@ -102,29 +94,30 @@ public class RadarRenderer {
         guiGraphics.drawString(mc.font, str, posX - stringWidth / 2F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
     }
 
-    private static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
-        Matrix4f matrix4f = guiGraphics.pose().last().pose();
-        if (minX < maxX) {
-            float i = minX;
-            minX = maxX;
-            maxX = i;
+    private static void drawGenericMarker(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, int color) {
+        if (perc < 0F || perc > 1F) {
+            return;
         }
-
-        if (minY < maxY) {
-            float j = minY;
-            minY = maxY;
-            maxY = j;
-        }
-
-        VertexConsumer vertexconsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
-        vertexconsumer.addVertex(matrix4f, minX, minY, 0F).setColor(color);
-        vertexconsumer.addVertex(matrix4f, minX, maxY, 0F).setColor(color);
-        vertexconsumer.addVertex(matrix4f, maxX, maxY, 0F).setColor(color);
-        vertexconsumer.addVertex(matrix4f, maxX, minY, 0F).setColor(color);
-        guiGraphics.flush();
+        float posX = hudX + (hudWidth - 1F) * perc + 1F;
+        drawGenericMarker(guiGraphics, posX, hudY + GENERIC_MARKER_SIZE / 2F + 1F, color);
     }
 
-    public static float calculateDirection(float angle) {
+    private static void drawGenericMarker(GuiGraphics guiGraphics, float x, float y, int color) {
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        float markerSize = GENERIC_MARKER_SIZE;
+        float texPos = (float) GENERIC_MARKER_SIZE / (float) GENERIC_MARKER_TEXTURE_SIZE;
+        GraphicsUtils.blitColored(guiGraphics, GENERIC_MARKER, x - markerSize / 2, x + markerSize / 2, y - markerSize / 2, y + markerSize / 2, 0F, texPos, 0F, texPos, color);
+        GraphicsUtils.blit(guiGraphics, GENERIC_MARKER_OVERLAY, x - markerSize / 2, x + markerSize / 2, y - markerSize / 2, y + markerSize / 2, 0F, texPos, 0F, texPos);
+    }
+
+    /**
+     * Calculates the HUD position based on the angle of the poi relative to the world direction while considering the FOV of the HUD.
+     *
+     * @param angle of the poi
+     * @return the position of the poi on the HUD. 0 means left side of the HUD and 1 means right side. Anything smaller than 0 or greater than 1 will be ignored.
+     */
+    public static float calculateHudPosition(float angle) {
         float playerAngle = mc.gameRenderer.getMainCamera().getYRot();
         // Normalize both angles to a range between 0 and 360
         float normalizedPlayerAngle = (playerAngle + 360F) % 360F;
@@ -138,11 +131,13 @@ public class RadarRenderer {
             angleDifference -= 360F;
         }
 
+        float fov = Main.CLIENT_CONFIG.hudFov.get().floatValue();
+
         // Now the angleDifference is between -180 and 180, we need to map it based on FOV
-        float halfFov = FOV / 2;
+        float halfFov = fov / 2F;
 
         // Map the angleDifference to a range of [0, 1]
         // Convert -halfFov to halfFov into 0 to 1 (where 0.5 is forward direction)
-        return (angleDifference + halfFov) / FOV;
+        return (angleDifference + halfFov) / fov;
     }
 }
