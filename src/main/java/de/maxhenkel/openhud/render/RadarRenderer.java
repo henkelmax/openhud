@@ -3,7 +3,6 @@ package de.maxhenkel.openhud.render;
 import de.maxhenkel.openhud.Main;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +24,14 @@ public class RadarRenderer {
     public static final int LINE_HEIGHT = 6;
     public static final int SHORT_LINE_HEIGHT = 3;
 
-    public static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    //TODO Add to waypoint properties
+    public static final double MAX_DISTANCE = 1000D;
+    public static final double MIN_DISTANCE = 4D;
+    public static final float MAX_ICON_SCALE = 1.5F;
+    public static final float MIN_ICON_SCALE = 0.5F;
+
+    public static void render(GuiGraphics guiGraphics) {
+        updatePulseFactor();
         if (mc.player == null) {
             return;
         }
@@ -68,11 +74,9 @@ public class RadarRenderer {
         }
 
         Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition();
-        double positionX = worldPosition.x;
-        double positionZ = worldPosition.z;
         for (Waypoint waypoint : WaypointClientManager.getWaypoints().getWaypoints()) {
-            float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, positionX, positionZ));
-            drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint);
+            float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, worldPosition.x, worldPosition.z));
+            drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint, worldPosition);
         }
     }
 
@@ -93,15 +97,30 @@ public class RadarRenderer {
         guiGraphics.drawString(mc.font, str, posX - stringWidth / 2F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
     }
 
-    private static void drawWaypoint(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, Waypoint waypoint) {
-        if (perc < 0F || perc > 1F) {
+    private static void drawWaypoint(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float hudPositionFactor, Waypoint waypoint, Vec3 worldPosition) {
+        double distance = Math.min(MAX_DISTANCE, worldPosition.multiply(1D, 0D, 1D).distanceTo(waypoint.getPosition().getCenter().multiply(1D, 0D, 1D)));
+
+        float factor;
+        if (distance > MIN_DISTANCE) {
+            factor = 1F - (float) (distance / MAX_DISTANCE);
+        } else {
+            factor = pulseFactor;
+            //Always center the waypoint if close by
+            hudPositionFactor = 0.5F;
+        }
+        float scale = MIN_ICON_SCALE + (MAX_ICON_SCALE - MIN_ICON_SCALE) * factor;
+
+        if (hudPositionFactor < 0F || hudPositionFactor > 1F) {
             return;
         }
-        float posX = hudX + (hudWidth - 1F) * perc + 1F;
+
+        float posX = hudX + (hudWidth - 1F) * hudPositionFactor + 1F;
         float posY = hudY + hudHeight / 2F;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(posX, posY, 0F);
-        
+
+        guiGraphics.pose().scale(scale, scale, 1F);
+
         //TODO Check if marker has custom icon
         drawColorMarker(guiGraphics, waypoint.getColor());
 
@@ -144,4 +163,26 @@ public class RadarRenderer {
         // Convert -halfFov to halfFov into 0 to 1 (where 0.5 is forward direction)
         return (angleDifference + halfFov) / fov;
     }
+
+    private static float pulseFactor;
+    private static boolean growing;
+    private static final float PULE_TIME_FACTOR = 0.1F;
+
+    private static void updatePulseFactor() {
+        float realtimeDeltaTicks = mc.getTimer().getRealtimeDeltaTicks();
+        if (growing) {
+            pulseFactor += realtimeDeltaTicks * PULE_TIME_FACTOR;
+            if (pulseFactor >= 1F) {
+                pulseFactor = 1F - (pulseFactor - 1F);
+                growing = false;
+            }
+        } else {
+            pulseFactor -= realtimeDeltaTicks * PULE_TIME_FACTOR;
+            if (pulseFactor <= 0F) {
+                pulseFactor = -pulseFactor;
+                growing = true;
+            }
+        }
+    }
+
 }
