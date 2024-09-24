@@ -2,6 +2,7 @@ package de.maxhenkel.openhud;
 
 import de.maxhenkel.openhud.config.ClientConfig;
 import de.maxhenkel.openhud.events.KeyEvents;
+import de.maxhenkel.openhud.events.NetworkEvents;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(Main.MODID)
 public class Main {
 
+    public static final int PROTOCOL_VERSION = 1;
     public static final String MODID = "openhud";
 
     public static final Logger LOGGER = LogManager.getLogger(Main.MODID);
@@ -29,6 +31,8 @@ public class Main {
         if (FMLEnvironment.dist.isClient()) {
             eventBus.addListener(KeyEvents::onRegisterKeyBinds);
         }
+
+        eventBus.addListener(NetworkEvents::register);
     }
 
 }
