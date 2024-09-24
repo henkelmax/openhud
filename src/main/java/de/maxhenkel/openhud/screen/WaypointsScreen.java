@@ -81,6 +81,10 @@ public class WaypointsScreen extends Screen {
         PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
     }
 
+    public void update() {
+        waypointList.updateEntries();
+    }
+
     private class WaypointList extends ListBase<WaypointList.Entry> {
 
         public WaypointList(int width, int height, int y, int itemHeight) {
@@ -127,6 +131,7 @@ public class WaypointsScreen extends Screen {
                 children.add(visible);
 
                 edit = Button.builder(EDIT, button -> {
+                    minecraft.setScreen(new WaypointScreen(WaypointsScreen.this, waypoint));
                     //TODO Open edit waypoint screen
                 }).size(40, 20).build();
                 children.add(edit);
@@ -134,7 +139,7 @@ public class WaypointsScreen extends Screen {
 
             @Override
             public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
-                guiGraphics.fill(left + PADDING, top + height / 2 - COLOR_SIZE / 2, left + PADDING + COLOR_SIZE, top + height / 2 + COLOR_SIZE / 2, 0xFFFFFFFF);
+                guiGraphics.fill(left + PADDING, top + height / 2 - COLOR_SIZE / 2, left + PADDING + COLOR_SIZE, top + height / 2 + COLOR_SIZE / 2, 0);
                 guiGraphics.fill(left + PADDING + 1, top + height / 2 - COLOR_SIZE / 2 + 1, left + PADDING + COLOR_SIZE - 1, top + height / 2 + COLOR_SIZE / 2 - 1, waypoint.getColor());
 
                 int posY = top + 3;

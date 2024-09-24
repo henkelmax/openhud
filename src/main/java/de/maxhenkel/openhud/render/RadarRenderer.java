@@ -1,6 +1,7 @@
 package de.maxhenkel.openhud.render;
 
 import de.maxhenkel.openhud.Main;
+import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.client.Minecraft;

@@ -1,4 +1,4 @@
-package de.maxhenkel.openhud.render;
+package de.maxhenkel.openhud.utils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
