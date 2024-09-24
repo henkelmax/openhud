@@ -5,6 +5,7 @@ import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
@@ -12,6 +13,11 @@ import net.minecraft.world.phys.Vec3;
 public class RadarRenderer {
 
     private static final Minecraft mc = Minecraft.getInstance();
+
+    public static final Component SOUTH = Component.translatable("message.openhud.radar.south");
+    public static final Component WEST = Component.translatable("message.openhud.radar.west");
+    public static final Component NORTH = Component.translatable("message.openhud.radar.north");
+    public static final Component EAST = Component.translatable("message.openhud.radar.east");
 
     public static final ResourceLocation GENERIC_MARKER = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker.png");
     public static final ResourceLocation GENERIC_MARKER_OVERLAY = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker_overlay.png");
@@ -26,7 +32,7 @@ public class RadarRenderer {
 
     //TODO Add to waypoint properties
     public static final double MAX_DISTANCE = 1000D;
-    public static final double MIN_DISTANCE = 4D;
+    public static final double MIN_DISTANCE = 8D;
     public static final float MAX_ICON_SCALE = 1.5F;
     public static final float MIN_ICON_SCALE = 0.5F;
 
@@ -53,22 +59,22 @@ public class RadarRenderer {
         if (Main.CLIENT_CONFIG.renderCardinalDirections.get()) {
             float south = calculateHudPosition(0F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, south);
-            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, south, "S");
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, south, SOUTH);
             float southwest = calculateHudPosition(45F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southwest);
             float west = calculateHudPosition(90F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, west);
-            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, west, "W");
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, west, WEST);
             float northwest = calculateHudPosition(135F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northwest);
             float north = calculateHudPosition(180F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, north);
-            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, north, "N");
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, north, NORTH);
             float northeast = calculateHudPosition(225F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northeast);
             float east = calculateHudPosition(-90F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, east);
-            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, east, "E");
+            drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, east, EAST);
             float southeast = calculateHudPosition(315F);
             drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southeast);
         }
@@ -88,13 +94,13 @@ public class RadarRenderer {
         GraphicsUtils.fill(guiGraphics, posX, hudY, posX + 1F, hudY + lineHeight, Main.CLIENT_CONFIG.lineColor.get());
     }
 
-    private static void drawString(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, String str) {
+    private static void drawString(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, Component str) {
         if (perc < 0F || perc > 1F) {
             return;
         }
         float posX = hudX + (hudWidth - 1F) * perc + 1F;
         float stringWidth = mc.font.width(str);
-        guiGraphics.drawString(mc.font, str, posX - stringWidth / 2F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
+        guiGraphics.drawString(mc.font, str.getVisualOrderText(), posX - stringWidth / 2F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
     }
 
     private static void drawWaypoint(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float hudPositionFactor, Waypoint waypoint, Vec3 worldPosition) {
