@@ -100,7 +100,7 @@ public class RadarRenderer {
     }
 
     public static float calculateDirection(float angle) {
-        float playerAngle = mc.player.getYHeadRot();
+        float playerAngle = mc.gameRenderer.getMainCamera().getYRot();
         // Normalize both angles to a range between 0 and 360
         float normalizedPlayerAngle = (playerAngle + 360F) % 360F;
         float normalizedPoiAngle = (angle + 360F) % 360F;
