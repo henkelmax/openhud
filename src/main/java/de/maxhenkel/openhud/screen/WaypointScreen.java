@@ -40,6 +40,7 @@ public class WaypointScreen extends Screen {
     protected EditBox coordinateZ;
     protected Checkbox visible;
     protected ColorDisplay waypointColor;
+    protected Button saveButton;
 
     protected boolean newWaypoint;
     protected Waypoint waypoint;
@@ -99,7 +100,7 @@ public class WaypointScreen extends Screen {
         contentLayout.addChild(new SpacerElement(200, 10));
 
         LinearLayout linearlayout = LinearLayout.horizontal().spacing(4);
-        linearlayout.addChild(Button.builder(SAVE, b -> {
+        saveButton = linearlayout.addChild(Button.builder(SAVE, b -> {
             updateWaypoint();
             onClose();
         }).width(98).build());
@@ -109,6 +110,14 @@ public class WaypointScreen extends Screen {
         contentLayout.visitWidgets(this::addRenderableWidget);
         contentLayout.arrangeElements();
         FrameLayout.centerInRectangle(contentLayout, getRectangle());
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (saveButton != null) {
+            saveButton.active = !waypointName.getValue().isBlank();
+        }
     }
 
     @Override
@@ -127,7 +136,7 @@ public class WaypointScreen extends Screen {
     }
 
     private void updateWaypoint() {
-        waypoint.setName(Component.literal(waypointName.getValue()));
+        waypoint.setName(Component.literal(waypointName.getValue().trim()));
         waypoint.setPosition(new BlockPos(parseCoordinate(coordinateX), parseCoordinate(coordinateY), parseCoordinate(coordinateZ)));
         waypoint.setColor(waypointColor.getColor());
         waypoint.setVisible(visible.selected());
