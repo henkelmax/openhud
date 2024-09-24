@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -19,14 +20,20 @@ public class WaypointScreen extends Screen {
 
     private static final Component TITLE = Component.translatable("gui.openhud.edit_waypoint.title");
     private static final Component WAYPOINT_NAME = Component.translatable("message.openhud.edit_waypoint.waypoint_name").withStyle(ChatFormatting.GRAY);
+    private static final Component COORDINATES = Component.translatable("message.openhud.edit_waypoint.coordinates").withStyle(ChatFormatting.GRAY);
     private static final Component VISIBLE = Component.translatable("message.openhud.edit_waypoint.visible").withStyle(ChatFormatting.GRAY);
     private static final Component COLOR = Component.translatable("message.openhud.edit_waypoint.color").withStyle(ChatFormatting.GRAY);
     private static final Component SAVE = Component.translatable("message.openhud.edit_waypoint.save");
     private static final Component CANCEL = Component.translatable("message.openhud.edit_waypoint.cancel");
 
+    private static final String COORDINATE_REGEX = "-?[0-9]{0,8}";
+
     @Nullable
     protected Screen parent;
     protected EditBox waypointName;
+    protected EditBox coordinateX;
+    protected EditBox coordinateY;
+    protected EditBox coordinateZ;
     protected Checkbox visible;
     protected ColorDisplay waypointColor;
 
@@ -46,6 +53,22 @@ public class WaypointScreen extends Screen {
         contentLayout.addChild(new StringWidget(WAYPOINT_NAME, font));
         waypointName = contentLayout.addChild(new EditBox(font, 200, 20, WAYPOINT_NAME));
         waypointName.setValue(waypoint.getName().getString());
+
+        contentLayout.addChild(new StringWidget(COORDINATES, font));
+        LinearLayout coordsLayout = LinearLayout.horizontal().spacing(4);
+        coordinateX = coordsLayout.addChild(new EditBox(font, 64, 20, COORDINATES));
+        coordinateY = coordsLayout.addChild(new EditBox(font, 64, 20, COORDINATES));
+        coordinateZ = coordsLayout.addChild(new EditBox(font, 64, 20, COORDINATES));
+        coordinateX.setMaxLength(9);
+        coordinateX.setFilter(s -> s.isEmpty() || s.matches(COORDINATE_REGEX));
+        coordinateX.setValue(String.valueOf(waypoint.getPosition().getX()));
+        coordinateY.setMaxLength(9);
+        coordinateY.setFilter(s -> s.isEmpty() || s.matches(COORDINATE_REGEX));
+        coordinateY.setValue(String.valueOf(waypoint.getPosition().getY()));
+        coordinateZ.setMaxLength(9);
+        coordinateZ.setFilter(s -> s.isEmpty() || s.matches(COORDINATE_REGEX));
+        coordinateZ.setValue(String.valueOf(waypoint.getPosition().getZ()));
+        contentLayout.addChild(coordsLayout);
 
         contentLayout.addChild(new StringWidget(COLOR, font));
         LinearLayout colorLayout = LinearLayout.horizontal().spacing(4);
@@ -89,9 +112,21 @@ public class WaypointScreen extends Screen {
 
     private void updateWaypoint() {
         waypoint.setName(Component.literal(waypointName.getValue()));
+        waypoint.setPosition(new BlockPos(parseCoordinate(coordinateX), parseCoordinate(coordinateY), parseCoordinate(coordinateZ)));
         waypoint.setColor(waypointColor.getColor());
         waypoint.setVisible(visible.selected());
         PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
+    }
+
+    private int parseCoordinate(EditBox editBox) {
+        if (editBox.getValue().isBlank()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(editBox.getValue());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
 }

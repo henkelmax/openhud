@@ -10,6 +10,7 @@
   "message.openhud.coordinates": "%s, %s, %s",
   "message.openhud.distance": "%s blocks away",
   "message.openhud.edit_waypoint.waypoint_name": "Waypoint name",
+  "message.openhud.edit_waypoint.coordinates": "Coordinates",
   "message.openhud.edit_waypoint.visible": "Visible",
   "message.openhud.edit_waypoint.color": "Color",
   "message.openhud.edit_waypoint.save": "Save",
