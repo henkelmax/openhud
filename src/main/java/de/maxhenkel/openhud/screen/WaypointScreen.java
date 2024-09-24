@@ -3,6 +3,7 @@ package de.maxhenkel.openhud.screen;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -15,10 +16,13 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class WaypointScreen extends Screen {
 
-    private static final Component TITLE = Component.translatable("gui.openhud.edit_waypoint.title");
+    private static final Component TITLE = Component.translatable("gui.openhud.waypoint.title");
+    private static final Component EDIT_WAYPOINT = Component.translatable("gui.openhud.edit_waypoint.title");
+    private static final Component CREATE_WAYPOINT = Component.translatable("gui.openhud.create_waypoint.title");
     private static final Component WAYPOINT_NAME = Component.translatable("message.openhud.edit_waypoint.waypoint_name").withStyle(ChatFormatting.GRAY);
     private static final Component COORDINATES = Component.translatable("message.openhud.edit_waypoint.coordinates").withStyle(ChatFormatting.GRAY);
     private static final Component VISIBLE = Component.translatable("message.openhud.edit_waypoint.visible").withStyle(ChatFormatting.GRAY);
@@ -37,11 +41,23 @@ public class WaypointScreen extends Screen {
     protected Checkbox visible;
     protected ColorDisplay waypointColor;
 
+    protected boolean newWaypoint;
     protected Waypoint waypoint;
 
-    public WaypointScreen(@Nullable Screen parent, Waypoint waypoint) {
+    public WaypointScreen(@Nullable Screen parent, @Nullable Waypoint waypoint) {
         super(TITLE);
         this.parent = parent;
+        if (waypoint == null) {
+            minecraft = Minecraft.getInstance();
+            newWaypoint = true;
+            waypoint = new Waypoint(
+                    UUID.randomUUID(),
+                    minecraft.gameRenderer.getMainCamera().getBlockPosition(),
+                    Component.empty(),
+                    ColorPicker.getColor(minecraft.level != null ? minecraft.level.random.nextFloat() : 0.5F),
+                    true
+            );
+        }
         this.waypoint = waypoint;
     }
 
@@ -98,7 +114,7 @@ public class WaypointScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(font, title, width / 2, 15, 0xFFFFFFFF);
+        guiGraphics.drawCenteredString(font, newWaypoint ? CREATE_WAYPOINT : EDIT_WAYPOINT, width / 2, 15, 0xFFFFFFFF);
     }
 
     @Override

@@ -17,6 +17,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     private static final Component TITLE = Component.translatable("gui.openhud.waypoints.title");
     private static final Component BACK = Component.translatable("message.openhud.back");
+    private static final Component CREATE = Component.translatable("message.openhud.new_waypoint");
     private static final Component EDIT = Component.translatable("message.openhud.edit");
     private static final int HEADER_SIZE = 30;
     private static final int FOOTER_SIZE = 50;
@@ -29,7 +30,6 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     @Nullable
     protected final Screen parent;
     protected WaypointList waypointList;
-    protected Button backButton;
 
     public WaypointsScreen(@Nullable Screen parent) {
         super(TITLE);
@@ -46,9 +46,13 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
         }
         addRenderableWidget(waypointList);
 
-        backButton = addRenderableWidget(Button.builder(BACK, button -> {
+        addRenderableWidget(Button.builder(CREATE, button -> {
+            minecraft.setScreen(new WaypointScreen(this, null));
+        }).bounds(width / 2 - 100 - 5, height - FOOTER_SIZE / 2 - 10, 100, 20).build());
+
+        addRenderableWidget(Button.builder(BACK, button -> {
             back();
-        }).bounds(width / 2 - 100, height - FOOTER_SIZE / 2 - 10, 200, 20).build());
+        }).bounds(width / 2 + 5, height - FOOTER_SIZE / 2 - 10, 100, 20).build());
     }
 
     @Override

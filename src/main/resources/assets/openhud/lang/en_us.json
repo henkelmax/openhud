@@ -15,6 +15,9 @@
   "message.openhud.edit_waypoint.color": "Color",
   "message.openhud.edit_waypoint.save": "Save",
   "message.openhud.edit_waypoint.cancel": "Cancel",
+  "message.openhud.new_waypoint": "New Waypoint",
   "gui.openhud.waypoints.title": "Waypoints",
-  "gui.openhud.edit_waypoint.title": "Edit Waypoint"
+  "gui.openhud.waypoint.title": "Waypoint",
+  "gui.openhud.edit_waypoint.title": "Edit Waypoint",
+  "gui.openhud.create_waypoint.title": "Create Waypoint"
 }
