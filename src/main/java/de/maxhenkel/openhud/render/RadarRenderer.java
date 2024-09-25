@@ -52,7 +52,7 @@ public class RadarRenderer {
         int width = mc.getWindow().getGuiScaledWidth();
         int height = mc.getWindow().getGuiScaledHeight();
 
-        int hudWidth = width / 2;
+        int hudWidth = (int) (width * Main.CLIENT_CONFIG.hudWidth.get());
         int hudHeight = HUD_HEIGHT;
         int startX = width / 2 - hudWidth / 2;
         int startY = PADDING;

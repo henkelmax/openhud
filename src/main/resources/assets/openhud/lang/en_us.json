@@ -44,6 +44,8 @@
   "openhud.configuration.render_cardinal_directions.tooltip": "If cardinal directions should be rendered on the HUD",
   "openhud.configuration.hud_fov": "Hud FOV",
   "openhud.configuration.hud_fov.tooltip": "The FOV of the HUD",
+  "openhud.configuration.hud_width": "HUD Width",
+  "openhud.configuration.hud_width.tooltip": "The width of the HUD",
   "openhud.configuration.line_color": "Line Color",
   "openhud.configuration.line_color.tooltip": "The color of the waypoint lines (ARGB packed as integer)",
   "openhud.configuration.waypoint_sort_order": "Waypoint Sort Order",
