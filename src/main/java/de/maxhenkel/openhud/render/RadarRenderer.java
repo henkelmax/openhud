@@ -49,8 +49,11 @@ public class RadarRenderer {
         if (mc.player == null) {
             return;
         }
-        int width = mc.getWindow().getGuiScaledWidth();
-        int height = mc.getWindow().getGuiScaledHeight();
+        guiGraphics.pose().pushPose();
+        float scale = Main.CLIENT_CONFIG.hudScale.get().floatValue();
+        guiGraphics.pose().scale(scale, scale, 1F);
+
+        int width = (int) (mc.getWindow().getGuiScaledWidth() / scale);
 
         int hudWidth = (int) (width * Main.CLIENT_CONFIG.hudWidth.get());
         int hudHeight = HUD_HEIGHT;
@@ -118,6 +121,7 @@ public class RadarRenderer {
             drawBottomLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, displayWaypointPos);
             drawWaypointName(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, displayWaypointPos, displayWaypoint);
         }
+        guiGraphics.pose().popPose();
     }
 
     private static void drawTopLine(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float lineHeight, float perc) {
