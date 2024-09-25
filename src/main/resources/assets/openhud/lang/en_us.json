@@ -32,5 +32,21 @@
   "gui.openhud.waypoints.title": "Waypoints",
   "gui.openhud.waypoint.title": "Waypoint",
   "gui.openhud.edit_waypoint.title": "Edit Waypoint",
-  "gui.openhud.create_waypoint.title": "Create Waypoint"
+  "gui.openhud.create_waypoint.title": "Create Waypoint",
+  "openhud.configuration.section.openhud.client.toml.title": "OpenHUD Configuration",
+  "openhud.configuration.section.openhud.client.toml": "OpenHUD Configuration",
+  "openhud.configuration.title": "OpenHUD Configuration",
+  "openhud.configuration.hide_hud": "Hide HUD",
+  "openhud.configuration.hide_hud.tooltip": "If the HUD should be hidden",
+  "openhud.configuration.render_waypoint_names": "Render Waypoint Names",
+  "openhud.configuration.render_waypoint_names.tooltip": "If waypoint names should be rendered on the HUD",
+  "openhud.configuration.render_cardinal_directions": "Render Cardinal Directions",
+  "openhud.configuration.render_cardinal_directions.tooltip": "If cardinal directions should be rendered on the HUD",
+  "openhud.configuration.hud_fov": "Hud FOV",
+  "openhud.configuration.hud_fov.tooltip": "The FOV of the HUD",
+  "openhud.configuration.line_color": "Line Color",
+  "openhud.configuration.line_color.tooltip": "The color of the waypoint lines (ARGB packed as integer)",
+  "openhud.configuration.waypoint_sort_order": "Waypoint Sort Order",
+  "openhud.configuration.waypoint_sort_order.tooltip": "The order in which waypoints are sorted in the waypoints screen"
+
 }

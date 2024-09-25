@@ -13,12 +13,12 @@ public class ClientConfig {
     public ModConfigSpec.EnumValue<SortOrder> waypointSortOrder;
 
     public ClientConfig(ModConfigSpec.Builder builder) {
-        hideHud = builder.define("hide_hud", false);
-        renderWaypointNames = builder.define("render_waypoint_names", true);
-        renderCardinalDirections = builder.define("render_cardinal_directions", true);
-        hudFov = builder.defineInRange("hud_fov", 180D, 12.5D, 360D);
-        lineColor = builder.defineInRange("line_color", 0xFFFFFFFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        waypointSortOrder = builder.defineEnum("waypoint_sort_order", SortOrder.CREATION_ASC);
+        hideHud = builder.comment("If the HUD should be hidden").define("hide_hud", false);
+        renderWaypointNames = builder.comment("If waypoint names should be rendered on the HUD").define("render_waypoint_names", true);
+        renderCardinalDirections = builder.comment("If cardinal directions should be rendered on the HUD").define("render_cardinal_directions", true);
+        hudFov = builder.comment("The FOV of the HUD").defineInRange("hud_fov", 180D, 12.5D, 360D);
+        lineColor = builder.comment("The color of the waypoint lines (ARGB packed as integer)").defineInRange("line_color", 0xFFFFFFFF, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        waypointSortOrder = builder.comment("The order in which waypoints are sorted in the waypoints screen").defineEnum("waypoint_sort_order", SortOrder.CREATION_ASC);
     }
 
 }

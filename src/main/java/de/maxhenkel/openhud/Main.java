@@ -8,6 +8,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +29,8 @@ public class Main {
         CLIENT_CONFIG = new ClientConfig(builder);
         ModConfigSpec spec = builder.build();
         container.registerConfig(ModConfig.Type.CLIENT, spec);
+
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
         if (FMLEnvironment.dist.isClient()) {
             eventBus.addListener(KeyEvents::onRegisterKeyBinds);
