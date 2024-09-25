@@ -10,13 +10,8 @@ import java.util.Optional;
 
 public class CodecUtils {
 
-    public static <T> CompoundTag toNBTCompound(Codec<T> codec, T object) {
-        Tag tag = codec.encodeStart(NbtOps.INSTANCE, object).result().orElseGet(CompoundTag::new);
-        if (tag instanceof CompoundTag compoundTag) {
-            return compoundTag;
-        } else {
-            throw new IllegalArgumentException("Expected a compound tag");
-        }
+    public static <T> Optional<Tag> toNBT(Codec<T> codec, T object) {
+        return codec.encodeStart(NbtOps.INSTANCE, object).result();
     }
 
     public static <T> Optional<T> fromNBT(Codec<T> codec, Tag nbt) {

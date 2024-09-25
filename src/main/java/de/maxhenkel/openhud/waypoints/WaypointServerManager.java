@@ -4,7 +4,6 @@ import de.maxhenkel.openhud.Main;
 import de.maxhenkel.openhud.net.DeleteWaypointPayload;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.net.WaypointsPayload;
-import de.maxhenkel.openhud.utils.CodecUtils;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -74,7 +73,7 @@ public class WaypointServerManager extends SavedData {
     public CompoundTag save(CompoundTag compound, HolderLookup.Provider registries) {
         CompoundTag waypointsTag = new CompoundTag();
         for (Map.Entry<UUID, PlayerWaypoints> entry : waypoints.entrySet()) {
-            waypointsTag.put(entry.getKey().toString(), CodecUtils.toNBTCompound(PlayerWaypoints.CODEC, entry.getValue()));
+            waypointsTag.put(entry.getKey().toString(), entry.getValue().toNbt());
         }
         compound.put("waypoints", waypointsTag);
 
@@ -93,7 +92,7 @@ public class WaypointServerManager extends SavedData {
                 Main.LOGGER.warn("Could not parse UUID from waypoint key: %s".formatted(key));
                 continue;
             }
-            CodecUtils.fromNBT(PlayerWaypoints.CODEC, waypointsTag.getCompound(key)).ifPresent(value -> manager.waypoints.put(uuid, value));
+            manager.waypoints.put(uuid, PlayerWaypoints.fromNbt(waypointsTag.getCompound(key)));
         }
         return manager;
     }

@@ -1,11 +1,13 @@
 package de.maxhenkel.openhud.waypoints;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.maxhenkel.openhud.utils.CodecUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -25,17 +27,7 @@ public class Waypoint implements Comparable<Waypoint> {
 
     public static final int MAX_WAYPOINT_NAME_LENGTH = 32;
 
-    public static final Codec<Waypoint> CODEC = RecordCodecBuilder.create(instance -> {
-        return instance.group(
-                UUIDUtil.CODEC.fieldOf("id").forGetter(Waypoint::getId),
-                BlockPos.CODEC.fieldOf("position").forGetter(Waypoint::getPosition),
-                ComponentSerialization.CODEC.fieldOf("name").forGetter(Waypoint::getName),
-                ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(Waypoint::getOptionalIcon),
-                Codec.INT.fieldOf("color").forGetter(Waypoint::getColor),
-                Codec.BOOL.fieldOf("visible").forGetter(Waypoint::isVisible),
-                Codec.BOOL.fieldOf("read_only").forGetter(Waypoint::isReadOnly)
-        ).apply(instance, Waypoint::new);
-    });
+    public static final Codec<Waypoint> CODEC = CompoundTag.CODEC.xmap(Waypoint::fromNbt, Waypoint::toNbt);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Waypoint> STREAM_CODEC = StreamCodec.of((buffer, value) -> {
         UUIDUtil.STREAM_CODEC.encode(buffer, value.getId());
@@ -152,6 +144,34 @@ public class Waypoint implements Comparable<Waypoint> {
     public double distanceToCamera() {
         Vec3 cameraPosition = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().multiply(1D, 0D, 1D);
         return cameraPosition.distanceTo(position.getCenter().multiply(1D, 0D, 1D));
+    }
+
+    public CompoundTag toNbt() {
+        CompoundTag tag = new CompoundTag();
+        tag.putUUID("id", id);
+        tag.put("position", NbtUtils.writeBlockPos(position));
+        CodecUtils.toNBT(ComponentSerialization.CODEC, name).ifPresent(value -> tag.put("name", value));
+        if (icon != null) {
+            tag.putString("icon", icon.toString());
+        }
+        tag.putInt("color", color);
+        tag.putBoolean("visible", visible);
+        tag.putBoolean("read_only", readOnly);
+        return tag;
+    }
+
+    public static Waypoint fromNbt(CompoundTag tag) {
+        UUID id = tag.getUUID("id");
+        BlockPos position = NbtUtils.readBlockPos(tag, "position").orElse(BlockPos.ZERO);
+        Component name = CodecUtils.fromNBT(ComponentSerialization.CODEC, tag.get("name")).orElse(Component.empty());
+        ResourceLocation icon = null;
+        if (tag.contains("icon", Tag.TAG_STRING)) {
+            icon = ResourceLocation.tryParse(tag.getString("icon"));
+        }
+        int color = tag.getInt("color");
+        boolean visible = tag.getBoolean("visible");
+        boolean readOnly = tag.getBoolean("read_only");
+        return new Waypoint(id, position, name, icon, color, visible, readOnly);
     }
 
 }

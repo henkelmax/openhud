@@ -1,7 +1,9 @@
 package de.maxhenkel.openhud.waypoints;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -11,9 +13,7 @@ import java.util.*;
 
 public class PlayerWaypoints {
 
-    public static final Codec<PlayerWaypoints> CODEC = RecordCodecBuilder.create(instance -> {
-        return instance.group(Codec.list(Waypoint.CODEC).fieldOf("waypoints").forGetter(PlayerWaypoints::createWaypointsList)).apply(instance, PlayerWaypoints::new);
-    });
+    public static final Codec<PlayerWaypoints> CODEC = CompoundTag.CODEC.xmap(PlayerWaypoints::fromNbt, PlayerWaypoints::toNbt);
 
     private static final StreamCodec<RegistryFriendlyByteBuf, List<Waypoint>> WAYPOINT_LIST_STREAM_CODEC = Waypoint.STREAM_CODEC.apply(ByteBufCodecs.list());
 
@@ -78,4 +78,22 @@ public class PlayerWaypoints {
         }
         return null;
     }
+
+    public CompoundTag toNbt() {
+        CompoundTag tag = new CompoundTag();
+        ListTag listTag = new ListTag();
+        waypoints.forEach(waypoint -> listTag.add(waypoint.toNbt()));
+        tag.put("waypoints", listTag);
+        return tag;
+    }
+
+    public static PlayerWaypoints fromNbt(CompoundTag tag) {
+        List<Waypoint> waypoints = new ArrayList<>();
+        ListTag listTag = tag.getList("waypoints", Tag.TAG_COMPOUND);
+        for (int i = 0; i < listTag.size(); i++) {
+            waypoints.add(Waypoint.fromNbt(listTag.getCompound(i)));
+        }
+        return new PlayerWaypoints(waypoints);
+    }
+
 }
