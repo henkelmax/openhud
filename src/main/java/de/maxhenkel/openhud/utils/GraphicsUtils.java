@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 
@@ -32,6 +33,21 @@ public class GraphicsUtils {
         bufferbuilder.addVertex(matrix4f, x2, y2, 0F).setUv(maxU, maxV);
         bufferbuilder.addVertex(matrix4f, x2, y1, 0F).setUv(maxU, minV);
         BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
+    }
+
+    public static void blit(GuiGraphics guiGraphics, TextureAtlasSprite sprite, float x1, float x2, float y1, float y2, float minU, float maxU, float minV, float maxV) {
+        float spriteXSize = sprite.getU1() - sprite.getU0();
+        float spriteMinU = sprite.getU0() + spriteXSize * minU;
+        float spriteMaxU = sprite.getU0() + spriteXSize * maxU;
+        float spriteYSize = sprite.getV1() - sprite.getV0();
+        float spriteMinV = sprite.getV0() + spriteYSize * minV;
+        float spriteMaxV = sprite.getV0() + spriteYSize * maxV;
+        //Prevent texture bleeding
+        spriteMinU = Math.max(0F, Math.min(1F, spriteMinU + 0.0001F));
+        spriteMaxU = Math.max(0F, Math.min(1F, spriteMaxU - 0.0001F));
+        spriteMinV = Math.max(0F, Math.min(1F, spriteMinV + 0.0001F));
+        spriteMaxV = Math.max(0F, Math.min(1F, spriteMaxV - 0.0001F));
+        blit(guiGraphics, sprite.atlasLocation(), x1, x2, y1, y2, spriteMinU, spriteMaxU, spriteMinV, spriteMaxV);
     }
 
     public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {

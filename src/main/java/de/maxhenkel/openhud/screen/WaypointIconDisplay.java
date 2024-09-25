@@ -1,5 +1,6 @@
 package de.maxhenkel.openhud.screen;
 
+import de.maxhenkel.openhud.texture.WaypointIcons;
 import de.maxhenkel.openhud.utils.GraphicsUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -47,7 +48,7 @@ public class WaypointIconDisplay extends AbstractWidget {
             return;
         }
 
-        GraphicsUtils.blit(guiGraphics, icon, getX() + 1, getX() + getHeight() - 1, getY() + 1, getY() + getWidth() - 1, 0F, 1F, 0F, 1F);
+        GraphicsUtils.blit(guiGraphics, WaypointIcons.get(icon), getX() + 1, getX() + getHeight() - 1, getY() + 1, getY() + getWidth() - 1, 0F, 1F, 0F, 1F);
     }
 
     @Override

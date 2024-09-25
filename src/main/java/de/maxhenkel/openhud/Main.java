@@ -1,6 +1,7 @@
 package de.maxhenkel.openhud;
 
 import de.maxhenkel.openhud.config.ClientConfig;
+import de.maxhenkel.openhud.texture.WaypointIcons;
 import de.maxhenkel.openhud.events.KeyEvents;
 import de.maxhenkel.openhud.events.NetworkEvents;
 import net.neoforged.bus.api.IEventBus;
@@ -34,6 +35,7 @@ public class Main {
 
         if (FMLEnvironment.dist.isClient()) {
             eventBus.addListener(KeyEvents::onRegisterKeyBinds);
+            eventBus.addListener(WaypointIcons::onRegisterStage);
         }
 
         eventBus.addListener(NetworkEvents::register);

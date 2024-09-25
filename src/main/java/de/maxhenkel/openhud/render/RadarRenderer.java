@@ -1,6 +1,7 @@
 package de.maxhenkel.openhud.render;
 
 import de.maxhenkel.openhud.Main;
+import de.maxhenkel.openhud.texture.WaypointIcons;
 import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
@@ -192,8 +193,7 @@ public class RadarRenderer {
     }
 
     private static void drawIconMarker(GuiGraphics guiGraphics, ResourceLocation icon) {
-        float markerSize = MARKER_SIZE;
-        GraphicsUtils.blit(guiGraphics, icon, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, 1F, 0F, 1F);
+        GraphicsUtils.blit(guiGraphics, WaypointIcons.get(icon), -MARKER_SIZE / 2F, MARKER_SIZE / 2F, -MARKER_SIZE / 2F, MARKER_SIZE / 2F, 0F, 1F, 0F, 1F);
     }
 
     /**
