@@ -11,7 +11,7 @@ Waypoints can be created and edited by the player or programmatically on the ser
 - Waypoints can be created and edited by players in-game as well as programmatically
 - Waypoints are stored on the server
 - Waypoints can be added, edited, removed or made read-only using the API
-- Waypoints are displayed on an in game hud
+- Waypoints are displayed on an in game HUD
 - Waypoints can be hidden
 - Fully open-source
 
