@@ -64,46 +64,74 @@ public class RadarRenderer {
 
         if (Main.CLIENT_CONFIG.renderCardinalDirections.get()) {
             float south = calculateHudPosition(0F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, south);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, south);
             drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, south, SOUTH);
             float southwest = calculateHudPosition(45F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southwest);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southwest);
             float west = calculateHudPosition(90F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, west);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, west);
             drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, west, WEST);
             float northwest = calculateHudPosition(135F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northwest);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northwest);
             float north = calculateHudPosition(180F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, north);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, north);
             drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, north, NORTH);
             float northeast = calculateHudPosition(225F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northeast);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, northeast);
             float east = calculateHudPosition(-90F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, east);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, LINE_HEIGHT, east);
             drawString(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, east, EAST);
             float southeast = calculateHudPosition(315F);
-            drawLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southeast);
+            drawTopLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, southeast);
         }
 
-        Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition();
+        Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition().multiply(1D, 0D, 1D);
         List<Waypoint> waypointsList = WaypointClientManager.getWaypoints().createWaypointsList();
         waypointsList.sort(DISTANCE_COMPARATOR);
+
+        Waypoint displayWaypoint = null;
+        float displayWaypointPos = 0.5F;
+        float closest = 0.125F;
+
         for (int i = waypointsList.size() - 1; i >= 0; i--) {
             Waypoint waypoint = waypointsList.get(i);
             if (!waypoint.isVisible()) {
                 continue;
             }
+            double distance = Math.min(MAX_DISTANCE, worldPosition.distanceTo(waypoint.getPosition().getCenter().multiply(1D, 0D, 1D)));
             float waypointPos = calculateHudPosition(WaypointUtils.getWaypointAngle(waypoint, worldPosition.x, worldPosition.z));
-            drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint, worldPosition);
+            if (Math.abs(waypointPos - 0.5F) <= closest) {
+                displayWaypoint = waypoint;
+                displayWaypointPos = waypointPos;
+                closest = Math.abs(waypointPos - 0.5F);
+            }
+            if (distance <= MIN_DISTANCE) {
+                displayWaypoint = waypoint;
+                displayWaypointPos = 0.5F;
+                closest = 0F;
+            }
+            drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint, distance);
+        }
+        if (displayWaypoint != null) {
+            drawBottomLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, displayWaypointPos);
+            drawWaypointName(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, displayWaypointPos, displayWaypoint);
         }
     }
 
-    private static void drawLine(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float lineHeight, float perc) {
+    private static void drawTopLine(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float lineHeight, float perc) {
         if (perc < 0F || perc > 1F) {
             return;
         }
         float posX = hudX + (hudWidth - 1F) * perc;
-        GraphicsUtils.fill(guiGraphics, posX, hudY, posX + 1F, hudY + lineHeight, Main.CLIENT_CONFIG.lineColor.get());
+        GraphicsUtils.fill(guiGraphics, posX + 0.5F, hudY, posX + 1F + 0.5F, hudY + lineHeight, Main.CLIENT_CONFIG.lineColor.get());
+    }
+
+    private static void drawBottomLine(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float lineHeight, float perc) {
+        if (perc < 0F || perc > 1F) {
+            return;
+        }
+        float posX = hudX + (hudWidth - 1F) * perc;
+        GraphicsUtils.fill(guiGraphics, posX + 0.5F, hudY + hudHeight - lineHeight, posX + 1F + 0.5F, hudY + hudHeight, Main.CLIENT_CONFIG.lineColor.get());
     }
 
     private static void drawString(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, Component str) {
@@ -112,12 +140,20 @@ public class RadarRenderer {
         }
         float posX = hudX + (hudWidth - 1F) * perc + 1F;
         float stringWidth = mc.font.width(str);
-        guiGraphics.drawString(mc.font, str.getVisualOrderText(), posX - stringWidth / 2F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
+        guiGraphics.drawString(mc.font, str.getVisualOrderText(), posX - stringWidth / 2F + 0.5F, hudY + hudHeight - mc.font.lineHeight - 2, 0xFFFFFF, false);
     }
 
-    private static void drawWaypoint(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float hudPositionFactor, Waypoint waypoint, Vec3 worldPosition) {
-        double distance = Math.min(MAX_DISTANCE, worldPosition.multiply(1D, 0D, 1D).distanceTo(waypoint.getPosition().getCenter().multiply(1D, 0D, 1D)));
+    private static void drawWaypointName(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float perc, Waypoint waypoint) {
+        float centerX = hudX + hudWidth * perc;
+        float padding = 2F;
+        float stringWidth = mc.font.width(waypoint.getName());
+        float textStartY = hudY + hudHeight + 4F;
+        float textStartX = centerX - stringWidth / 2F;
+        GraphicsUtils.fill(guiGraphics, textStartX - padding, textStartY - padding, textStartX + stringWidth + padding, textStartY + mc.font.lineHeight + padding, HUD_FILL_COLOR);
+        guiGraphics.drawString(mc.font, waypoint.getName().getVisualOrderText(), textStartX + 0.5F, textStartY + 1F, 0xFFFFFF, false);
+    }
 
+    private static void drawWaypoint(GuiGraphics guiGraphics, float hudX, float hudY, float hudWidth, float hudHeight, float hudPositionFactor, Waypoint waypoint, double distance) {
         float factor;
         if (distance > MIN_DISTANCE) {
             factor = 1F - (float) (distance / MAX_DISTANCE);
