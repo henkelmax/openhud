@@ -123,7 +123,6 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
             for (Waypoint waypoint : waypointsList) {
                 addEntry(new Entry(waypoint));
             }
-            setScrollAmount(0D);
         }
 
         @Override
@@ -171,25 +170,25 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
                 int posY = top + 3;
                 int colorEnd = left + PADDING + COLOR_SIZE;
-                int buttonStart = left + width - visible.getWidth() - PADDING - 40 - PADDING;
-                int textSpace = colorEnd - buttonStart;
+                int visibleStart = left + width - visible.getWidth() - PADDING - 40 - PADDING;
+                int textSpace = colorEnd - visibleStart;
 
-                guiGraphics.drawString(font, waypoint.getName(), buttonStart + textSpace / 2 - WaypointsScreen.this.font.width(waypoint.getName()) / 2, posY, 0xFFFFFFFF, true);
+                guiGraphics.drawString(font, waypoint.getName(), visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(waypoint.getName()) / 2, posY, 0xFFFFFFFF, true);
                 posY += font.lineHeight + 3;
 
                 Component coords = Component.translatable("message.openhud.coordinates", waypoint.getPosition().getX(), waypoint.getPosition().getY(), waypoint.getPosition().getZ());
-                guiGraphics.drawString(font, coords, buttonStart + textSpace / 2 - WaypointsScreen.this.font.width(coords) / 2, posY, 0xFFFFFFFF, true);
+                guiGraphics.drawString(font, coords, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(coords) / 2, posY, 0xFFFFFFFF, true);
                 posY += font.lineHeight + 3;
 
                 int distanceInBlocks = (int) minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(waypoint.getPosition().getCenter());
                 Component distance = Component.translatable("message.openhud.distance", NUMBER_FORMAT.format(distanceInBlocks));
-                guiGraphics.drawString(font, distance, buttonStart + textSpace / 2 - WaypointsScreen.this.font.width(distance) / 2, posY, 0xFFFFFFFF, true);
+                guiGraphics.drawString(font, distance, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(distance) / 2, posY, 0xFFFFFFFF, true);
 
-                visible.setPosition(left + width - visible.getWidth() - PADDING, top + height / 2 - visible.getHeight() / 2);
-                visible.render(guiGraphics, mouseX, mouseY, delta);
-
-                edit.setPosition(buttonStart, top + height / 2 - 10);
+                edit.setPosition(left + width - 40 - PADDING, top + height / 2 - 10);
                 edit.render(guiGraphics, mouseX, mouseY, delta);
+
+                visible.setPosition(visibleStart, top + height / 2 - visible.getHeight() / 2);
+                visible.render(guiGraphics, mouseX, mouseY, delta);
             }
         }
 
