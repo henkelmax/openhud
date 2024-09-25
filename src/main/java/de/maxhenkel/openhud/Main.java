@@ -1,5 +1,6 @@
 package de.maxhenkel.openhud;
 
+import de.maxhenkel.openhud.api.HudManager;
 import de.maxhenkel.openhud.config.ClientConfig;
 import de.maxhenkel.openhud.events.KeyEvents;
 import de.maxhenkel.openhud.events.NetworkEvents;
@@ -45,7 +46,7 @@ public class Main {
     private static void processImc(InterModProcessEvent event) {
         event.getIMCStream().filter(imcMessage -> IMC_METHOD.equals(imcMessage.method())).forEach(message -> {
             if (message.messageSupplier().get() instanceof Consumer<?> consumer) {
-                Consumer<de.maxhenkel.openhud.api.HudManager> hudManagerConsumer = (Consumer<de.maxhenkel.openhud.api.HudManager>) consumer;
+                Consumer<HudManager> hudManagerConsumer = (Consumer<HudManager>) consumer;
                 hudManagerConsumer.accept(HudManagerImpl.INSTANCE);
             }
         });
