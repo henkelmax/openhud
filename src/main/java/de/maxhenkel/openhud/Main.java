@@ -4,6 +4,8 @@ import de.maxhenkel.openhud.config.ClientConfig;
 import de.maxhenkel.openhud.texture.WaypointIcons;
 import de.maxhenkel.openhud.events.KeyEvents;
 import de.maxhenkel.openhud.events.NetworkEvents;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -26,6 +28,14 @@ public class Main {
     public static ClientConfig CLIENT_CONFIG;
 
     public Main(IEventBus eventBus, ModContainer container) {
+        if (FMLEnvironment.dist.isClient()) {
+            initClient(eventBus, container);
+        }
+        eventBus.addListener(NetworkEvents::register);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void initClient(IEventBus eventBus, ModContainer container) {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         CLIENT_CONFIG = new ClientConfig(builder);
         ModConfigSpec spec = builder.build();
@@ -33,12 +43,8 @@ public class Main {
 
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
-        if (FMLEnvironment.dist.isClient()) {
-            eventBus.addListener(KeyEvents::onRegisterKeyBinds);
-            eventBus.addListener(WaypointIcons::onRegisterStage);
-        }
-
-        eventBus.addListener(NetworkEvents::register);
+        eventBus.addListener(KeyEvents::onRegisterKeyBinds);
+        eventBus.addListener(WaypointIcons::onRegisterStage);
     }
 
 }

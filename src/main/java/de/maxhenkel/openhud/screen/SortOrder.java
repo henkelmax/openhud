@@ -2,11 +2,14 @@ package de.maxhenkel.openhud.screen;
 
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import net.minecraft.network.chat.Component;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 
+@OnlyIn(Dist.CLIENT)
 public enum SortOrder {
 
     CREATION_ASC(Component.translatable("message.openhud.order.creation_asc"), null),

@@ -14,7 +14,8 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import org.lwjgl.glfw.GLFW;
 
-@EventBusSubscriber
+@OnlyIn(Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class KeyEvents {
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -23,7 +24,6 @@ public class KeyEvents {
     public static KeyMapping WAYPOINTS;
     public static KeyMapping CREATE_WAYPOINT;
 
-    @OnlyIn(Dist.CLIENT)
     public static void onRegisterKeyBinds(RegisterKeyMappingsEvent event) {
         HIDE_HUD = new KeyMapping("key.openhud.hide_hud", InputConstants.UNKNOWN.getValue(), "key.categories.misc");
         event.register(HIDE_HUD);
@@ -33,7 +33,6 @@ public class KeyEvents {
         event.register(CREATE_WAYPOINT);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onKeyInput(InputEvent.Key event) {
         if (HIDE_HUD.consumeClick()) {
