@@ -8,7 +8,7 @@ version = "${mod_version}"
 displayName = "OpenHUD"
 updateJSONURL = "https://update.maxhenkel.de/neoforge/openhud"
 displayURL = "https://modrinth.com/mod/openhud"
-#logoFile = "icon.png"
+logoFile = "icon.png"
 authors = "Max Henkel"
 description = '''An open source solution for displaying waypoints'''
 [[dependencies.openhud]]
