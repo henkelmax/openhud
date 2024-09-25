@@ -65,6 +65,11 @@ public class WaypointServerManager extends SavedData {
         return removed;
     }
 
+    public boolean canEditWaypoint(ServerPlayer player, UUID waypointId) {
+        PlayerWaypoints playerWaypoints = get(player);
+        return playerWaypoints.getById(waypointId).map(w -> !w.isReadOnly()).orElse(true);
+    }
+
     @Override
     public CompoundTag save(CompoundTag compound, HolderLookup.Provider registries) {
         CompoundTag waypointsTag = new CompoundTag();

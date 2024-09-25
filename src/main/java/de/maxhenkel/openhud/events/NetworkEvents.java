@@ -51,8 +51,12 @@ public class NetworkEvents {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
+        WaypointServerManager waypointServerManager = WaypointServerManager.get(player.serverLevel());
+        if (!waypointServerManager.canEditWaypoint(player, waypoint.getId())) {
+            Main.LOGGER.warn("Player {} tried to edit readonly waypoint {}", player.getName(), waypoint.getId());
+            return;
+        }
         WaypointServerManager.get(player.serverLevel()).addOrUpdateWaypoint(player, waypoint);
-        //TODO Check permissions
         context.reply(new UpdateWaypointPayload(waypoint));
     }
 
@@ -66,8 +70,12 @@ public class NetworkEvents {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
-        WaypointServerManager.get(player.serverLevel()).removeWaypoint(player, waypointId);
-        //TODO Check permissions
+        WaypointServerManager waypointServerManager = WaypointServerManager.get(player.serverLevel());
+        if (!waypointServerManager.canEditWaypoint(player, waypointId)) {
+            Main.LOGGER.warn("Player {} tried to delete readonly waypoint {}", player.getName(), waypointId);
+            return;
+        }
+        waypointServerManager.removeWaypoint(player, waypointId);
         context.reply(new DeleteWaypointPayload(waypointId));
     }
 
