@@ -18,7 +18,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+
+import java.util.UUID;
 
 public class NetworkEvents {
 
@@ -30,30 +33,48 @@ public class NetworkEvents {
         });
         registrar.playBidirectional(UpdateWaypointPayload.TYPE, Waypoint.STREAM_CODEC.map(UpdateWaypointPayload::new, PayloadWrapper::getPayload), (payload, context) -> {
             if (context.flow().equals(PacketFlow.CLIENTBOUND)) {
-                WaypointClientManager.getWaypoints().addOrUpdateWaypoint(payload.getPayload());
-                checkUpdateScreens();
+                onUpdateClient(context, payload.getPayload());
             } else {
-                if (!(context.player() instanceof ServerPlayer player)) {
-                    return;
-                }
-                WaypointServerManager.get(player.serverLevel()).addOrUpdateWaypoint(player, payload.getPayload());
-                //TODO Check permissions
-                context.reply(new UpdateWaypointPayload(payload.getPayload()));
+                onUpdateServer(context, payload.getPayload());
             }
         });
         registrar.playBidirectional(DeleteWaypointPayload.TYPE, UUIDUtil.STREAM_CODEC.map(DeleteWaypointPayload::new, PayloadWrapper::getPayload), (payload, context) -> {
             if (context.flow().equals(PacketFlow.CLIENTBOUND)) {
-                WaypointClientManager.getWaypoints().removeWaypoint(payload.getPayload());
-                checkUpdateScreens();
+                onDeleteClient(context, payload.getPayload());
             } else {
-                if (!(context.player() instanceof ServerPlayer player)) {
-                    return;
-                }
-                WaypointServerManager.get(player.serverLevel()).removeWaypoint(player, payload.getPayload());
-                //TODO Check permissions
-                context.reply(new DeleteWaypointPayload(payload.getPayload()));
+                onDeleteServer(context, payload.getPayload());
             }
         });
+    }
+
+    private static void onUpdateServer(IPayloadContext context, Waypoint waypoint) {
+        if (!(context.player() instanceof ServerPlayer player)) {
+            return;
+        }
+        WaypointServerManager.get(player.serverLevel()).addOrUpdateWaypoint(player, waypoint);
+        //TODO Check permissions
+        context.reply(new UpdateWaypointPayload(waypoint));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static void onUpdateClient(IPayloadContext context, Waypoint waypoint) {
+        WaypointClientManager.getWaypoints().addOrUpdateWaypoint(waypoint);
+        checkUpdateScreens();
+    }
+
+    private static void onDeleteServer(IPayloadContext context, UUID waypointId) {
+        if (!(context.player() instanceof ServerPlayer player)) {
+            return;
+        }
+        WaypointServerManager.get(player.serverLevel()).removeWaypoint(player, waypointId);
+        //TODO Check permissions
+        context.reply(new DeleteWaypointPayload(waypointId));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static void onDeleteClient(IPayloadContext context, UUID waypointId) {
+        WaypointClientManager.getWaypoints().removeWaypoint(waypointId);
+        checkUpdateScreens();
     }
 
     @OnlyIn(Dist.CLIENT)
