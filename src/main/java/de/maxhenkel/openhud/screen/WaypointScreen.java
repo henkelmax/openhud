@@ -13,6 +13,7 @@ import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -39,7 +40,9 @@ public class WaypointScreen extends Screen {
     protected EditBox coordinateY;
     protected EditBox coordinateZ;
     protected Checkbox visible;
-    protected ColorDisplay waypointColor;
+    protected WaypointIconDisplay waypointColor;
+    @Nullable
+    protected ResourceLocation icon;
     protected Button saveButton;
 
     protected boolean newWaypoint;
@@ -60,6 +63,7 @@ public class WaypointScreen extends Screen {
             );
         }
         this.waypoint = waypoint;
+        icon = waypoint.getIcon();
     }
 
     @Override
@@ -90,9 +94,10 @@ public class WaypointScreen extends Screen {
 
         contentLayout.addChild(new StringWidget(COLOR, font));
         LinearLayout colorLayout = LinearLayout.horizontal().spacing(4);
-        waypointColor = colorLayout.addChild(new ColorDisplay(0, 0, 20, 20, waypoint.getColor()));
+        waypointColor = colorLayout.addChild(new WaypointIconDisplay(0, 0, 20, 20, waypoint.getColor(), waypoint.getIcon()));
         colorLayout.addChild(new ColorPicker(0, 0, 176, 20, color -> {
             waypointColor.setColor(color);
+            icon = null;
         }));
         contentLayout.addChild(colorLayout);
 
@@ -140,6 +145,7 @@ public class WaypointScreen extends Screen {
         waypoint.setName(Component.literal(waypointName.getValue().trim()));
         waypoint.setPosition(new BlockPos(parseCoordinate(coordinateX), parseCoordinate(coordinateY), parseCoordinate(coordinateZ)));
         waypoint.setColor(waypointColor.getColor());
+        waypoint.setIcon(icon);
         waypoint.setVisible(visible.selected());
         PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
     }
