@@ -47,7 +47,7 @@ public class DeleteWaypointScreen extends Screen {
             onClose();
         }).width(98).build());
         linearlayout.addChild(Button.builder(CANCEL, b -> onClose()).width(98).build());
-        contentLayout.addChild(linearlayout);
+        contentLayout.addChild(linearlayout, LayoutSettings.defaults().alignHorizontallyCenter());
 
         contentLayout.visitWidgets(this::addRenderableWidget);
         contentLayout.arrangeElements();
