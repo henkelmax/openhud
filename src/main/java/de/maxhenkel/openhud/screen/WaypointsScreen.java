@@ -1,5 +1,6 @@
 package de.maxhenkel.openhud.screen;
 
+import de.maxhenkel.openhud.Main;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
@@ -7,16 +8,19 @@ import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
+import java.util.List;
 
 public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     private static final Component TITLE = Component.translatable("gui.openhud.waypoints.title");
+    private static final Component ORDER = Component.translatable("message.openhud.order");
     private static final Component BACK = Component.translatable("message.openhud.back");
     private static final Component CREATE = Component.translatable("message.openhud.new_waypoint");
     private static final Component EDIT = Component.translatable("message.openhud.edit");
@@ -30,6 +34,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     @Nullable
     protected final Screen parent;
+    protected CycleButton<SortOrder> sortOrder;
     protected WaypointList waypointList;
 
     public WaypointsScreen(@Nullable Screen parent) {
@@ -40,6 +45,18 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     @Override
     protected void init() {
         super.init();
+
+        sortOrder = addRenderableWidget(
+                CycleButton.builder(SortOrder::getName)
+                        .withValues(SortOrder.values())
+                        .withInitialValue(Main.CLIENT_CONFIG.waypointSortOrder.get())
+                        .create(width - 100 - PADDING, PADDING, 100, 20, ORDER, (cycleButton, value) -> {
+                            Main.CLIENT_CONFIG.waypointSortOrder.set(value);
+                            Main.CLIENT_CONFIG.waypointSortOrder.save();
+                            waypointList.updateEntries();
+                        })
+        );
+
         if (waypointList != null) {
             waypointList.updateSizeAndPosition(width, height - HEADER_SIZE - FOOTER_SIZE, HEADER_SIZE);
         } else {
@@ -102,7 +119,8 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
             clearEntries();
             setSelected(null);
 
-            for (Waypoint waypoint : WaypointClientManager.getWaypoints().getWaypoints()) {
+            List<Waypoint> waypointsList = sortOrder.getValue().sort(WaypointClientManager.getWaypoints().createWaypointsList());
+            for (Waypoint waypoint : waypointsList) {
                 addEntry(new Entry(waypoint));
             }
             setScrollAmount(0D);

@@ -127,7 +127,7 @@ public class Waypoint implements Comparable<Waypoint> {
 
     @Override
     public int compareTo(@NotNull Waypoint o) {
-        return name.getString().compareTo(o.getName().getString());
+        return name.getString().compareToIgnoreCase(o.getName().getString());
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -8,7 +8,6 @@ import net.minecraft.network.codec.StreamCodec;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlayerWaypoints {
 
@@ -24,26 +23,26 @@ public class PlayerWaypoints {
             PlayerWaypoints::new
     );
 
-    protected Map<UUID, Waypoint> waypoints;
+    protected List<Waypoint> waypoints;
 
     public PlayerWaypoints() {
-        this.waypoints = new LinkedHashMap<>();
+        this.waypoints = new ArrayList<>();
     }
 
     public PlayerWaypoints(List<Waypoint> waypoints) {
-        this.waypoints = new HashMap<>(waypoints.stream().filter(Objects::nonNull).collect(Collectors.toMap(Waypoint::getId, waypoint -> waypoint)));
+        this.waypoints = new ArrayList<>(waypoints.stream().filter(Objects::nonNull).toList());
     }
 
     public List<Waypoint> createWaypointsList() {
-        return new ArrayList<>(waypoints.values());
+        return new ArrayList<>(waypoints);
     }
 
-    public Collection<Waypoint> getWaypoints() {
-        return waypoints.values();
+    public List<Waypoint> getWaypoints() {
+        return Collections.unmodifiableList(waypoints);
     }
 
     public Optional<Waypoint> getById(UUID id) {
-        return Optional.ofNullable(waypoints.get(id));
+        return waypoints.stream().filter(waypoint -> waypoint.getId().equals(id)).findFirst();
     }
 
     /**
@@ -52,7 +51,15 @@ public class PlayerWaypoints {
      */
     @Nullable
     public Waypoint addOrUpdateWaypoint(Waypoint waypoint) {
-        return waypoints.put(waypoint.getId(), waypoint);
+        for (int i = 0; i < waypoints.size(); i++) {
+            Waypoint existingWaypoint = waypoints.get(i);
+            if (existingWaypoint.getId().equals(waypoint.getId())) {
+                waypoints.set(i, waypoint);
+                return existingWaypoint;
+            }
+        }
+        waypoints.add(waypoint);
+        return null;
     }
 
     @Nullable
@@ -62,6 +69,13 @@ public class PlayerWaypoints {
 
     @Nullable
     public Waypoint removeWaypoint(UUID waypointId) {
-        return waypoints.remove(waypointId);
+        for (int i = 0; i < waypoints.size(); i++) {
+            Waypoint existingWaypoint = waypoints.get(i);
+            if (existingWaypoint.getId().equals(waypointId)) {
+                waypoints.remove(i);
+                return existingWaypoint;
+            }
+        }
+        return null;
     }
 }
