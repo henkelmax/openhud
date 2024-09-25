@@ -112,7 +112,7 @@ public class RadarRenderer {
             }
             drawWaypoint(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, waypointPos, waypoint, distance);
         }
-        if (displayWaypoint != null) {
+        if (displayWaypoint != null && Main.CLIENT_CONFIG.renderWaypointNames.get()) {
             drawBottomLine(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, SHORT_LINE_HEIGHT, displayWaypointPos);
             drawWaypointName(guiGraphics, contentStartX, contentStartY, contentWidth, contentHeight, displayWaypointPos, displayWaypoint);
         }
