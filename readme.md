@@ -41,3 +41,6 @@ OpenHud.getWaypointManager(player.serverLevel())
 - More default icons
 - Waypoint icon selection GUI
 - Client-side API
+- Sharing waypoints
+- Commands
+- Better settings screen
