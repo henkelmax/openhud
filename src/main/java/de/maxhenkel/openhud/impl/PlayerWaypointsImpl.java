@@ -154,7 +154,7 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
             }
 
             WaypointImpl waypointImpl = new WaypointImpl(PlayerWaypointsImpl.this, waypoint);
-            getPlayerWaypoints().addOrUpdateWaypoint(waypoint);
+            addOrUpdateWaypoint(waypointImpl);
             return waypointImpl;
         }
     }
