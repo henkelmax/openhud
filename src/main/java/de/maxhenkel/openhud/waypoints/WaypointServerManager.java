@@ -8,12 +8,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,37 +35,49 @@ public class WaypointServerManager extends SavedData {
         this.waypoints = new HashMap<>();
     }
 
-    private Optional<PlayerWaypoints> getWaypoints(UUID player) {
+    private Optional<PlayerWaypoints> getOptionalWaypoints(UUID player) {
         return Optional.ofNullable(waypoints.get(player));
     }
 
-    private Optional<PlayerWaypoints> getWaypoints(Player player) {
-        return getWaypoints(player.getUUID());
+    private Optional<PlayerWaypoints> getOptionalWaypoints(ServerPlayer player) {
+        return getOptionalWaypoints(player.getUUID());
     }
 
     @Nonnull
-    private PlayerWaypoints get(ServerPlayer player) {
-        return waypoints.computeIfAbsent(player.getUUID(), uuid -> new PlayerWaypoints());
+    public PlayerWaypoints getWaypoints(UUID playerId) {
+        return waypoints.computeIfAbsent(playerId, uuid -> new PlayerWaypoints());
+    }
+
+    @NotNull
+    public PlayerWaypoints getWaypoints(ServerPlayer player) {
+        return getWaypoints(player.getUUID());
     }
 
     @Nullable
     public Waypoint addOrUpdateWaypoint(ServerPlayer player, Waypoint waypoint) {
-        Waypoint oldWaypoint = get(player).addOrUpdateWaypoint(waypoint);
+        Waypoint oldWaypoint = getWaypoints(player).addOrUpdateWaypoint(waypoint);
         PacketDistributor.sendToPlayer(player, new UpdateWaypointPayload(waypoint));
         setDirty();
         return oldWaypoint;
     }
 
     @Nullable
+    public Waypoint addOrUpdateWaypointWithoutSendingToClient(UUID player, Waypoint waypoint) {
+        Waypoint oldWaypoint = getWaypoints(player).addOrUpdateWaypoint(waypoint);
+        setDirty();
+        return oldWaypoint;
+    }
+
+    @Nullable
     public Waypoint removeWaypoint(ServerPlayer player, UUID waypointId) {
-        Waypoint removed = get(player).removeWaypoint(waypointId);
+        Waypoint removed = getWaypoints(player).removeWaypoint(waypointId);
         PacketDistributor.sendToPlayer(player, new DeleteWaypointPayload(waypointId));
         setDirty();
         return removed;
     }
 
     public boolean canEditWaypoint(ServerPlayer player, UUID waypointId) {
-        PlayerWaypoints playerWaypoints = get(player);
+        PlayerWaypoints playerWaypoints = getWaypoints(player);
         return playerWaypoints.getById(waypointId).map(w -> !w.isReadOnly()).orElse(true);
     }
 
@@ -119,7 +131,7 @@ public class WaypointServerManager extends SavedData {
 
     private static void updateWaypoints(ServerPlayer player) {
         WaypointServerManager manager = get(player.serverLevel());
-        manager.getWaypoints(player).ifPresent(waypoints -> {
+        manager.getOptionalWaypoints(player).ifPresent(waypoints -> {
             player.connection.send(new WaypointsPayload(waypoints));
         });
     }

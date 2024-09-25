@@ -66,6 +66,10 @@ public class Waypoint implements Comparable<Waypoint> {
         this.readOnly = readOnly;
     }
 
+    public Waypoint(UUID id, Component name) {
+        this(id, BlockPos.ZERO, name, (ResourceLocation) null, 0, true, false); //TODO Random value
+    }
+
     public Waypoint(UUID id, BlockPos position, Component name, Optional<ResourceLocation> icon, int color, boolean visible, boolean readOnly) {
         this(id, position, name, icon.orElse(null), color, visible, readOnly);
     }
