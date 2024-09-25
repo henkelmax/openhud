@@ -169,6 +169,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                         .sprite(EDIT_ICON, 16, 16)
                         .build();
                 children.add(edit);
+                edit.active = !waypoint.isReadOnly();
                 delete = SpriteIconButton.builder(DELETE, button -> {
                             minecraft.setScreen(new DeleteWaypointScreen(WaypointsScreen.this, waypoint));
                         }, true)
@@ -176,6 +177,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                         .sprite(DELETE_ICON, 16, 16)
                         .build();
                 children.add(delete);
+                delete.active = !waypoint.isReadOnly();
             }
 
             @Override

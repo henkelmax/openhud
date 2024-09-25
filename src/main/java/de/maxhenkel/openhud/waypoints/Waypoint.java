@@ -32,26 +32,28 @@ public class Waypoint implements Comparable<Waypoint> {
                 ComponentSerialization.CODEC.fieldOf("name").forGetter(Waypoint::getName),
                 ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(Waypoint::getOptionalIcon),
                 Codec.INT.fieldOf("color").forGetter(Waypoint::getColor),
-                Codec.BOOL.fieldOf("visible").forGetter(Waypoint::isVisible)
-
+                Codec.BOOL.fieldOf("visible").forGetter(Waypoint::isVisible),
+                Codec.BOOL.fieldOf("read_only").forGetter(Waypoint::isReadOnly)
         ).apply(instance, Waypoint::new);
     });
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, Waypoint> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC,
-            Waypoint::getId,
-            BlockPos.STREAM_CODEC,
-            Waypoint::getPosition,
-            ComponentSerialization.STREAM_CODEC,
-            Waypoint::getName,
-            CodecUtils.optionalStreamCodec(ResourceLocation.STREAM_CODEC),
-            Waypoint::getOptionalIcon,
-            ByteBufCodecs.INT,
-            Waypoint::getColor,
-            ByteBufCodecs.BOOL,
-            Waypoint::isVisible,
-            Waypoint::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, Waypoint> STREAM_CODEC = StreamCodec.of((buffer, value) -> {
+        UUIDUtil.STREAM_CODEC.encode(buffer, value.getId());
+        BlockPos.STREAM_CODEC.encode(buffer, value.getPosition());
+        ComponentSerialization.STREAM_CODEC.encode(buffer, value.getName());
+        CodecUtils.optionalStreamCodec(ResourceLocation.STREAM_CODEC).encode(buffer, value.getOptionalIcon());
+        ByteBufCodecs.INT.encode(buffer, value.getColor());
+        ByteBufCodecs.BOOL.encode(buffer, value.isVisible());
+        ByteBufCodecs.BOOL.encode(buffer, value.isReadOnly());
+    }, buffer -> new Waypoint(
+            UUIDUtil.STREAM_CODEC.decode(buffer),
+            BlockPos.STREAM_CODEC.decode(buffer),
+            ComponentSerialization.STREAM_CODEC.decode(buffer),
+            CodecUtils.optionalStreamCodec(ResourceLocation.STREAM_CODEC).decode(buffer),
+            ByteBufCodecs.INT.decode(buffer),
+            ByteBufCodecs.BOOL.decode(buffer),
+            ByteBufCodecs.BOOL.decode(buffer)
+    ));
 
     protected final UUID id;
     protected BlockPos position;
@@ -60,22 +62,28 @@ public class Waypoint implements Comparable<Waypoint> {
     protected ResourceLocation icon;
     protected int color;
     protected boolean visible;
+    protected boolean readOnly;
 
-    public Waypoint(UUID id, BlockPos position, Component name, ResourceLocation icon, int color, boolean visible) {
+    public Waypoint(UUID id, BlockPos position, Component name, @Nullable ResourceLocation icon, int color, boolean visible, boolean readOnly) {
         this.id = id;
         this.position = position;
         this.name = name;
         this.icon = icon;
         this.color = color;
         this.visible = visible;
+        this.readOnly = readOnly;
     }
 
-    public Waypoint(UUID id, BlockPos position, Component name, Optional<ResourceLocation> icon, int color, boolean visible) {
-        this(id, position, name, icon.orElse(null), color, visible);
+    public Waypoint(UUID id, BlockPos position, Component name, Optional<ResourceLocation> icon, int color, boolean visible, boolean readOnly) {
+        this(id, position, name, icon.orElse(null), color, visible, readOnly);
+    }
+
+    public Waypoint(UUID id, BlockPos position, Component name, int color, boolean visible, boolean readOnly) {
+        this(id, position, name, (ResourceLocation) null, color, visible, readOnly);
     }
 
     public Waypoint(UUID id, BlockPos position, Component name, int color, boolean visible) {
-        this(id, position, name, (ResourceLocation) null, color, visible);
+        this(id, position, name, (ResourceLocation) null, color, visible, false);
     }
 
     public UUID getId() {
@@ -125,6 +133,14 @@ public class Waypoint implements Comparable<Waypoint> {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 
     @Override
