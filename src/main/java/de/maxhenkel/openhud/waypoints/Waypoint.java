@@ -23,6 +23,8 @@ import java.util.UUID;
 
 public class Waypoint implements Comparable<Waypoint> {
 
+    public static final int MAX_WAYPOINT_NAME_LENGTH = 32;
+
     public static final Codec<Waypoint> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
                 UUIDUtil.CODEC.fieldOf("id").forGetter(Waypoint::getId),

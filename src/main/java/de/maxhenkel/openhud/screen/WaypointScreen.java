@@ -70,7 +70,7 @@ public class WaypointScreen extends Screen {
         contentLayout.addChild(new StringWidget(WAYPOINT_NAME, font));
         waypointName = contentLayout.addChild(new EditBox(font, 200, 20, WAYPOINT_NAME));
         waypointName.setValue(waypoint.getName().getString());
-        waypointName.setMaxLength(32);
+        waypointName.setMaxLength(Waypoint.MAX_WAYPOINT_NAME_LENGTH);
 
         contentLayout.addChild(new StringWidget(COORDINATES, font));
         LinearLayout coordsLayout = LinearLayout.horizontal().spacing(4);
