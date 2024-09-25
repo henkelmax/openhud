@@ -1,7 +1,6 @@
 package de.maxhenkel.openhud.screen;
 
 import de.maxhenkel.openhud.Main;
-import de.maxhenkel.openhud.net.DeleteWaypointPayload;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
@@ -171,7 +170,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                         .build();
                 children.add(edit);
                 delete = SpriteIconButton.builder(DELETE, button -> {
-                            PacketDistributor.sendToServer(new DeleteWaypointPayload(waypoint.getId()));
+                            minecraft.setScreen(new DeleteWaypointScreen(WaypointsScreen.this, waypoint));
                         }, true)
                         .width(20)
                         .sprite(DELETE_ICON, 16, 16)
