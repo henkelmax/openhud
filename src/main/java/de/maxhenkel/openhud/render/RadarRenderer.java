@@ -31,6 +31,7 @@ public class RadarRenderer {
     public static final int MARKER_SIZE = 6;
     public static final int GENERIC_MARKER_TEXTURE_SIZE = 8;
 
+    public static final int HUD_HEIGHT = 20;
     public static final int HUD_FILL_COLOR = FastColor.ARGB32.colorFromFloat(0.25F, 0F, 0F, 0F);
     public static final int PADDING = 10;
     public static final int BOX_INNER_HORIZONTAL_PADDING = 2;
@@ -52,7 +53,7 @@ public class RadarRenderer {
         int height = mc.getWindow().getGuiScaledHeight();
 
         int hudWidth = width / 2;
-        int hudHeight = 20;
+        int hudHeight = HUD_HEIGHT;
         int startX = width / 2 - hudWidth / 2;
         int startY = PADDING;
         guiGraphics.fill(startX, startY, startX + hudWidth, startY + hudHeight, HUD_FILL_COLOR);
