@@ -22,7 +22,7 @@ public class RadarRenderer {
 
     public static final ResourceLocation GENERIC_MARKER = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker.png");
     public static final ResourceLocation GENERIC_MARKER_OVERLAY = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker_overlay.png");
-    public static final int GENERIC_MARKER_SIZE = 6;
+    public static final int MARKER_SIZE = 6;
     public static final int GENERIC_MARKER_TEXTURE_SIZE = 8;
 
     public static final int HUD_FILL_COLOR = FastColor.ARGB32.colorFromFloat(0.25F, 0F, 0F, 0F);
@@ -131,17 +131,25 @@ public class RadarRenderer {
 
         guiGraphics.pose().scale(scale, scale, 1F);
 
-        //TODO Check if marker has custom icon
-        drawColorMarker(guiGraphics, waypoint.getColor());
+        if (waypoint.getIcon() != null) {
+            drawIconMarker(guiGraphics, waypoint.getIcon());
+        } else {
+            drawColorMarker(guiGraphics, waypoint.getColor());
+        }
 
         guiGraphics.pose().popPose();
     }
 
     private static void drawColorMarker(GuiGraphics guiGraphics, int color) {
-        float markerSize = GENERIC_MARKER_SIZE;
-        float texPos = (float) GENERIC_MARKER_SIZE / (float) GENERIC_MARKER_TEXTURE_SIZE;
+        float markerSize = MARKER_SIZE;
+        float texPos = (float) MARKER_SIZE / (float) GENERIC_MARKER_TEXTURE_SIZE;
         GraphicsUtils.blitColored(guiGraphics, GENERIC_MARKER, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, texPos, 0F, texPos, color);
         GraphicsUtils.blit(guiGraphics, GENERIC_MARKER_OVERLAY, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, texPos, 0F, texPos);
+    }
+
+    private static void drawIconMarker(GuiGraphics guiGraphics, ResourceLocation icon) {
+        float markerSize = MARKER_SIZE;
+        GraphicsUtils.blit(guiGraphics, icon, -markerSize / 2, markerSize / 2, -markerSize / 2, markerSize / 2, 0F, 1F, 0F, 1F);
     }
 
     /**

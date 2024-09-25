@@ -1,6 +1,7 @@
 package de.maxhenkel.openhud.screen;
 
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
+import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.client.gui.GuiGraphics;
@@ -144,8 +145,12 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
             @Override
             public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float delta) {
-                guiGraphics.fill(left + PADDING, top + height / 2 - COLOR_SIZE / 2, left + PADDING + COLOR_SIZE, top + height / 2 + COLOR_SIZE / 2, 0);
-                guiGraphics.fill(left + PADDING + 1, top + height / 2 - COLOR_SIZE / 2 + 1, left + PADDING + COLOR_SIZE - 1, top + height / 2 + COLOR_SIZE / 2 - 1, waypoint.getColor());
+                if (waypoint.getIcon() != null) {
+                    GraphicsUtils.blit(guiGraphics, waypoint.getIcon(), left + PADDING + 1, left + PADDING + COLOR_SIZE - 1F, top + height / 2 - COLOR_SIZE / 2 + 1, top + height / 2 + COLOR_SIZE / 2 - 1, 0F, 1F, 0F, 1F);
+                } else {
+                    guiGraphics.fill(left + PADDING, top + height / 2 - COLOR_SIZE / 2, left + PADDING + COLOR_SIZE, top + height / 2 + COLOR_SIZE / 2, 0xFFFFFFFF);
+                    guiGraphics.fill(left + PADDING + 1, top + height / 2 - COLOR_SIZE / 2 + 1, left + PADDING + COLOR_SIZE - 1, top + height / 2 + COLOR_SIZE / 2 - 1, waypoint.getColor());
+                }
 
                 int posY = top + 3;
                 int colorEnd = left + PADDING + COLOR_SIZE;
