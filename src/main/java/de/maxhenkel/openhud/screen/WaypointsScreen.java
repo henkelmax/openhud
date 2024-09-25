@@ -135,7 +135,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
         @Override
         public int getRowWidth() {
-            return super.getRowWidth() + 50;
+            return super.getRowWidth() + 100;
         }
 
         @Override
