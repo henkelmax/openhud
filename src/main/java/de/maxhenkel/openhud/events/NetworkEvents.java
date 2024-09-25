@@ -51,6 +51,11 @@ public class NetworkEvents {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
+        String waypointName = waypoint.getName().getString();
+        if (waypointName.isBlank() || waypointName.length() > Waypoint.MAX_WAYPOINT_NAME_LENGTH) {
+            Main.LOGGER.warn("Player {} tried to create waypoint with invalid name", player.getName());
+            return;
+        }
         WaypointServerManager waypointServerManager = WaypointServerManager.get(player.serverLevel());
         if (!waypointServerManager.canEditWaypoint(player, waypoint.getId())) {
             Main.LOGGER.warn("Player {} tried to edit readonly waypoint {}", player.getName(), waypoint.getId());
