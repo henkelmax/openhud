@@ -1,6 +1,7 @@
 package de.maxhenkel.openhud.screen;
 
 import de.maxhenkel.openhud.Main;
+import de.maxhenkel.openhud.net.DeleteWaypointPayload;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
@@ -9,8 +10,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -24,10 +27,14 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     private static final Component BACK = Component.translatable("message.openhud.back");
     private static final Component CREATE = Component.translatable("message.openhud.new_waypoint");
     private static final Component EDIT = Component.translatable("message.openhud.edit");
+    private static final Component DELETE = Component.translatable("message.openhud.delete");
+    private static final ResourceLocation EDIT_ICON = ResourceLocation.fromNamespaceAndPath(Main.MODID, "icon/edit");
+    private static final ResourceLocation DELETE_ICON = ResourceLocation.fromNamespaceAndPath(Main.MODID, "icon/delete");
     private static final int HEADER_SIZE = 30;
     private static final int FOOTER_SIZE = 50;
     private static final int CELL_HEIGHT = 40;
     private static final int PADDING = 5;
+    private static final int SPACING = 2;
     private static final int COLOR_SIZE = 20;
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
@@ -123,6 +130,8 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
             for (Waypoint waypoint : waypointsList) {
                 addEntry(new Entry(waypoint));
             }
+
+            clampScrollAmount();
         }
 
         @Override
@@ -139,7 +148,8 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
             private final Waypoint waypoint;
             private final Checkbox visible;
-            private final Button edit;
+            private final SpriteIconButton edit;
+            private final SpriteIconButton delete;
 
             public Entry(Waypoint waypoint) {
                 this.waypoint = waypoint;
@@ -153,10 +163,20 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                         .build();
                 children.add(visible);
 
-                edit = Button.builder(EDIT, button -> {
-                    minecraft.setScreen(new WaypointScreen(WaypointsScreen.this, waypoint));
-                }).size(40, 20).build();
+                edit = SpriteIconButton.builder(EDIT, button -> {
+                            minecraft.setScreen(new WaypointScreen(WaypointsScreen.this, waypoint));
+                        }, true)
+                        .width(20)
+                        .sprite(EDIT_ICON, 16, 16)
+                        .build();
                 children.add(edit);
+                delete = SpriteIconButton.builder(DELETE, button -> {
+                            PacketDistributor.sendToServer(new DeleteWaypointPayload(waypoint.getId()));
+                        }, true)
+                        .width(20)
+                        .sprite(DELETE_ICON, 16, 16)
+                        .build();
+                children.add(delete);
             }
 
             @Override
@@ -168,27 +188,30 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                     guiGraphics.fill(left + PADDING + 1, top + height / 2 - COLOR_SIZE / 2 + 1, left + PADDING + COLOR_SIZE - 1, top + height / 2 + COLOR_SIZE / 2 - 1, waypoint.getColor());
                 }
 
-                int posY = top + 3;
+                int posY = top + 4;
                 int colorEnd = left + PADDING + COLOR_SIZE;
-                int visibleStart = left + width - visible.getWidth() - PADDING - 40 - PADDING;
+                int visibleStart = left + width - 17 - 20 * 2 - SPACING * 2 - PADDING;
                 int textSpace = colorEnd - visibleStart;
 
                 guiGraphics.drawString(font, waypoint.getName(), visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(waypoint.getName()) / 2, posY, 0xFFFFFFFF, true);
-                posY += font.lineHeight + 3;
+                posY += font.lineHeight + 1;
 
                 Component coords = Component.translatable("message.openhud.coordinates", waypoint.getPosition().getX(), waypoint.getPosition().getY(), waypoint.getPosition().getZ());
                 guiGraphics.drawString(font, coords, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(coords) / 2, posY, 0xFFFFFFFF, true);
-                posY += font.lineHeight + 3;
+                posY += font.lineHeight + 1;
 
                 int distanceInBlocks = (int) minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(waypoint.getPosition().getCenter());
                 Component distance = Component.translatable("message.openhud.distance", NUMBER_FORMAT.format(distanceInBlocks));
                 guiGraphics.drawString(font, distance, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(distance) / 2, posY, 0xFFFFFFFF, true);
 
-                edit.setPosition(left + width - 40 - PADDING, top + height / 2 - 10);
-                edit.render(guiGraphics, mouseX, mouseY, delta);
-
                 visible.setPosition(visibleStart, top + height / 2 - visible.getHeight() / 2);
                 visible.render(guiGraphics, mouseX, mouseY, delta);
+
+                edit.setPosition(left + width - 20 * 2 - SPACING - PADDING, top + height / 2 - 10);
+                edit.render(guiGraphics, mouseX, mouseY, delta);
+
+                delete.setPosition(left + width - 20 - PADDING, top + height / 2 - 10);
+                delete.render(guiGraphics, mouseX, mouseY, delta);
             }
         }
 
