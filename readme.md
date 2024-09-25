@@ -3,6 +3,12 @@
 This mod introduces customizable waypoints, displayed on an in-game HUD.
 Waypoints can be created and edited by the player or programmatically on the server side.
 
+![](https://github.com/user-attachments/assets/a771bc9d-3f3f-464d-81f4-38743e0de0aa)
+
+![](https://github.com/user-attachments/assets/7715347f-64e1-4816-906f-ff5b18d34b44)
+
+![](https://github.com/user-attachments/assets/0b9b1e8d-7702-4dba-93d5-976412d9df11)
+
 ## Features
 
 - In game compass HUD displaying waypoints
