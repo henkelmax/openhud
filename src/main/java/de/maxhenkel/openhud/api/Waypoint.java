@@ -27,21 +27,23 @@ public interface Waypoint {
     Builder edit();
 
     interface Builder {
-        Builder setId(UUID id);
 
-        Builder setPosition(BlockPos position);
+        Builder id(UUID id);
 
-        Builder setName(Component name);
+        Builder position(BlockPos position);
 
-        Builder setIcon(@Nullable ResourceLocation icon);
+        Builder name(Component name);
 
-        Builder setColor(int color);
+        Builder icon(@Nullable ResourceLocation icon);
 
-        Builder setVisible(boolean visible);
+        Builder color(int color);
 
-        Builder setReadOnly(boolean readOnly);
+        Builder visible(boolean visible);
+
+        Builder readOnly(boolean readOnly);
 
         Waypoint save();
+
     }
 
 }

@@ -73,42 +73,42 @@ public class WaypointImpl implements Waypoint {
         protected ValueHolder<Boolean> readOnly;
 
         @Override
-        public Builder setId(UUID id) {
+        public Builder id(UUID id) {
             throw new IllegalCallerException("Cannot change ID of existing waypoint");
         }
 
         @Override
-        public Builder setPosition(BlockPos position) {
+        public Builder position(BlockPos position) {
             this.position = ValueHolder.of(position);
             return this;
         }
 
         @Override
-        public Builder setName(Component name) {
+        public Builder name(Component name) {
             this.name = ValueHolder.of(name);
             return this;
         }
 
         @Override
-        public Builder setIcon(@Nullable ResourceLocation icon) {
+        public Builder icon(@Nullable ResourceLocation icon) {
             this.icon = ValueHolder.of(icon);
             return this;
         }
 
         @Override
-        public Builder setColor(int color) {
+        public Builder color(int color) {
             this.color = ValueHolder.of(color);
             return this;
         }
 
         @Override
-        public Builder setVisible(boolean visible) {
+        public Builder visible(boolean visible) {
             this.visible = ValueHolder.of(visible);
             return this;
         }
 
         @Override
-        public Builder setReadOnly(boolean readOnly) {
+        public Builder readOnly(boolean readOnly) {
             this.readOnly = ValueHolder.of(readOnly);
             return this;
         }

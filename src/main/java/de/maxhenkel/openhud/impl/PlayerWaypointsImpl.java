@@ -86,43 +86,43 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
         protected Boolean readOnly;
 
         @Override
-        public Waypoint.Builder setId(UUID id) {
+        public Waypoint.Builder id(UUID id) {
             this.id = id;
             return this;
         }
 
         @Override
-        public Waypoint.Builder setPosition(BlockPos position) {
+        public Waypoint.Builder position(BlockPos position) {
             this.position = position;
             return this;
         }
 
         @Override
-        public Waypoint.Builder setName(Component name) {
+        public Waypoint.Builder name(Component name) {
             this.name = name;
             return this;
         }
 
         @Override
-        public Waypoint.Builder setIcon(@Nullable ResourceLocation icon) {
+        public Waypoint.Builder icon(@Nullable ResourceLocation icon) {
             this.icon = icon;
             return this;
         }
 
         @Override
-        public Waypoint.Builder setColor(int color) {
+        public Waypoint.Builder color(int color) {
             this.color = color;
             return this;
         }
 
         @Override
-        public Waypoint.Builder setVisible(boolean visible) {
+        public Waypoint.Builder visible(boolean visible) {
             this.visible = visible;
             return this;
         }
 
         @Override
-        public Waypoint.Builder setReadOnly(boolean readOnly) {
+        public Waypoint.Builder readOnly(boolean readOnly) {
             this.readOnly = readOnly;
             return this;
         }
