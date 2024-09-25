@@ -156,7 +156,6 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
                 edit = Button.builder(EDIT, button -> {
                     minecraft.setScreen(new WaypointScreen(WaypointsScreen.this, waypoint));
-                    //TODO Open edit waypoint screen
                 }).size(40, 20).build();
                 children.add(edit);
             }
