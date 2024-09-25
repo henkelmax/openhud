@@ -1,6 +1,6 @@
 # OpenHUD
 
-This mod introduces customizable waypoints, displayed on an in-game HUD and compass.
+This mod introduces customizable waypoints, displayed on an in-game HUD.
 Waypoints can be created and edited by the player or programmatically on the server side.
 
 ## Features
