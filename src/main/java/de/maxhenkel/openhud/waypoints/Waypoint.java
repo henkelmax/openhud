@@ -3,6 +3,7 @@ package de.maxhenkel.openhud.waypoints;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.maxhenkel.openhud.utils.CodecUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -11,12 +12,16 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Waypoint {
+public class Waypoint implements Comparable<Waypoint> {
 
     public static final Codec<Waypoint> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
@@ -119,4 +124,16 @@ public class Waypoint {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+
+    @Override
+    public int compareTo(@NotNull Waypoint o) {
+        return name.getString().compareTo(o.getName().getString());
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public double distanceToCamera() {
+        Vec3 cameraPosition = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().multiply(1D, 0D, 1D);
+        return cameraPosition.distanceTo(position.getCenter().multiply(1D, 0D, 1D));
+    }
+
 }

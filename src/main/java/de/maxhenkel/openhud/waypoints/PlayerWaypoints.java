@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 public class PlayerWaypoints {
 
     public static final Codec<PlayerWaypoints> CODEC = RecordCodecBuilder.create(instance -> {
-        return instance.group(Codec.list(Waypoint.CODEC).fieldOf("waypoints").forGetter(PlayerWaypoints::getWaypointsList)).apply(instance, PlayerWaypoints::new);
+        return instance.group(Codec.list(Waypoint.CODEC).fieldOf("waypoints").forGetter(PlayerWaypoints::createWaypointsList)).apply(instance, PlayerWaypoints::new);
     });
 
     private static final StreamCodec<RegistryFriendlyByteBuf, List<Waypoint>> WAYPOINT_LIST_STREAM_CODEC = Waypoint.STREAM_CODEC.apply(ByteBufCodecs.list());
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PlayerWaypoints> STREAM_CODEC = StreamCodec.composite(
             WAYPOINT_LIST_STREAM_CODEC,
-            PlayerWaypoints::getWaypointsList,
+            PlayerWaypoints::createWaypointsList,
             PlayerWaypoints::new
     );
 
@@ -34,7 +34,7 @@ public class PlayerWaypoints {
         this.waypoints = new HashMap<>(waypoints.stream().filter(Objects::nonNull).collect(Collectors.toMap(Waypoint::getId, waypoint -> waypoint)));
     }
 
-    private List<Waypoint> getWaypointsList() {
+    public List<Waypoint> createWaypointsList() {
         return new ArrayList<>(waypoints.values());
     }
 

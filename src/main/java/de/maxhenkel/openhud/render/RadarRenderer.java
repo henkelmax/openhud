@@ -11,9 +11,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Comparator;
+import java.util.List;
+
 public class RadarRenderer {
 
     private static final Minecraft mc = Minecraft.getInstance();
+
+    private static final Comparator<Waypoint> DISTANCE_COMPARATOR = Comparator.comparingDouble(Waypoint::distanceToCamera);
 
     public static final Component SOUTH = Component.translatable("message.openhud.radar.south");
     public static final Component WEST = Component.translatable("message.openhud.radar.west");
@@ -81,7 +86,10 @@ public class RadarRenderer {
         }
 
         Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition();
-        for (Waypoint waypoint : WaypointClientManager.getWaypoints().getWaypoints()) {
+        List<Waypoint> waypointsList = WaypointClientManager.getWaypoints().createWaypointsList();
+        waypointsList.sort(DISTANCE_COMPARATOR);
+        for (int i = waypointsList.size() - 1; i >= 0; i--) {
+            Waypoint waypoint = waypointsList.get(i);
             if (!waypoint.isVisible()) {
                 continue;
             }
