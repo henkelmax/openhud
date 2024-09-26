@@ -25,7 +25,7 @@ Waypoints can be created and edited by the player or programmatically on the ser
 ``` java
 ServerPlayer player = ...;
 
-OpenHud.getWaypointManager(player.serverLevel())
+OpenHud.getServerWaypointManager(player.serverLevel())
         .getWaypoints(player)
         .newWaypoint()
         .name(Component.literal("Programmatic waypoint"))

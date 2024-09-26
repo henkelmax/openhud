@@ -8,12 +8,12 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class WaypointImpl implements Waypoint {
+public class ServerWaypointImpl implements Waypoint {
 
-    protected PlayerWaypointsImpl playerWaypoints;
+    protected ServerPlayerWaypointsImpl playerWaypoints;
     protected de.maxhenkel.openhud.waypoints.Waypoint waypoint;
 
-    public WaypointImpl(PlayerWaypointsImpl playerWaypoints, de.maxhenkel.openhud.waypoints.Waypoint waypoint) {
+    public ServerWaypointImpl(ServerPlayerWaypointsImpl playerWaypoints, de.maxhenkel.openhud.waypoints.Waypoint waypoint) {
         this.playerWaypoints = playerWaypoints;
         this.waypoint = waypoint;
     }
@@ -60,10 +60,10 @@ public class WaypointImpl implements Waypoint {
 
     @Override
     public Builder edit() {
-        return new EditorBuilderImpl();
+        return new ServerEditorBuilderImpl();
     }
 
-    private class EditorBuilderImpl implements Builder {
+    public static abstract class EditorBuilderImpl implements Builder {
 
         protected ValueHolder<BlockPos> position;
         protected ValueHolder<Component> name;
@@ -112,6 +112,9 @@ public class WaypointImpl implements Waypoint {
             this.readOnly = ValueHolder.of(readOnly);
             return this;
         }
+    }
+
+    private class ServerEditorBuilderImpl extends EditorBuilderImpl {
 
         @Override
         public Waypoint save() {
@@ -134,12 +137,12 @@ public class WaypointImpl implements Waypoint {
                 waypoint.setReadOnly(readOnly.value());
             }
 
-            playerWaypoints.addOrUpdateWaypoint(WaypointImpl.this);
-            return WaypointImpl.this;
+            playerWaypoints.addOrUpdateWaypoint(ServerWaypointImpl.this);
+            return ServerWaypointImpl.this;
         }
     }
 
-    private record ValueHolder<T>(@Nullable T value) {
+    public static record ValueHolder<T>(@Nullable T value) {
         public static <T> ValueHolder<T> of(@Nullable T value) {
             return new ValueHolder<>(value);
         }

@@ -13,14 +13,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class PlayerWaypointsImpl implements PlayerWaypoints {
+public class ServerPlayerWaypointsImpl implements PlayerWaypoints {
 
-    protected LevelWaypointsImpl levelWaypoints;
+    protected ServerLevelWaypointsImpl levelWaypoints;
     @Nullable
     protected de.maxhenkel.openhud.waypoints.PlayerWaypoints playerWaypoints;
     protected UUID playerId;
 
-    public PlayerWaypointsImpl(LevelWaypointsImpl levelWaypoints, UUID playerId) {
+    public ServerPlayerWaypointsImpl(ServerLevelWaypointsImpl levelWaypoints, UUID playerId) {
         this.levelWaypoints = levelWaypoints;
         this.playerId = playerId;
     }
@@ -32,7 +32,7 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
         return playerWaypoints;
     }
 
-    public LevelWaypointsImpl getLevelWaypoints() {
+    public ServerLevelWaypointsImpl getLevelWaypoints() {
         return levelWaypoints;
     }
 
@@ -42,7 +42,7 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
     }
 
     public void addOrUpdateWaypoint(Waypoint waypoint) {
-        if (!(waypoint instanceof WaypointImpl waypointImpl)) {
+        if (!(waypoint instanceof ServerWaypointImpl waypointImpl)) {
             return;
         }
         WaypointServerManager waypointManager = levelWaypoints.getWaypointManager();
@@ -57,17 +57,17 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
 
     @Override
     public Stream<Waypoint> getWaypoints() {
-        return getPlayerWaypoints().getWaypoints().stream().map(waypoint -> new WaypointImpl(this, waypoint));
+        return getPlayerWaypoints().getWaypoints().stream().map(waypoint -> new ServerWaypointImpl(this, waypoint));
     }
 
     @Override
     public Optional<Waypoint> getById(UUID id) {
-        return getPlayerWaypoints().getById(id).map(waypoint -> new WaypointImpl(this, waypoint));
+        return getPlayerWaypoints().getById(id).map(waypoint -> new ServerWaypointImpl(this, waypoint));
     }
 
     @Override
     public Waypoint.Builder newWaypoint() {
-        return new CreateBuilderImpl();
+        return new CreateServerBuilderImpl();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
         return getPlayerWaypoints().removeWaypoint(waypointId) != null;
     }
 
-    private class CreateBuilderImpl implements Waypoint.Builder {
+    public static abstract class CreateBuilderImpl implements Waypoint.Builder {
 
         protected UUID id;
         protected BlockPos position;
@@ -127,8 +127,7 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
             return this;
         }
 
-        @Override
-        public Waypoint save() {
+        protected de.maxhenkel.openhud.waypoints.Waypoint construct() {
             if (name == null || name.getString().isBlank()) {
                 throw new IllegalStateException("Waypoint name cannot be empty");
             }
@@ -152,8 +151,15 @@ public class PlayerWaypointsImpl implements PlayerWaypoints {
             if (readOnly != null) {
                 waypoint.setReadOnly(readOnly);
             }
+            return waypoint;
+        }
 
-            WaypointImpl waypointImpl = new WaypointImpl(PlayerWaypointsImpl.this, waypoint);
+    }
+
+    private class CreateServerBuilderImpl extends CreateBuilderImpl {
+        @Override
+        public Waypoint save() {
+            ServerWaypointImpl waypointImpl = new ServerWaypointImpl(ServerPlayerWaypointsImpl.this, construct());
             addOrUpdateWaypoint(waypointImpl);
             return waypointImpl;
         }

@@ -9,13 +9,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class LevelWaypointsImpl implements LevelWaypoints {
+public class ServerLevelWaypointsImpl implements LevelWaypoints {
 
     protected final ServerLevel serverLevel;
     @Nullable
     protected WaypointServerManager waypointManager;
 
-    public LevelWaypointsImpl(ServerLevel serverLevel) {
+    public ServerLevelWaypointsImpl(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
     }
 
@@ -33,6 +33,6 @@ public class LevelWaypointsImpl implements LevelWaypoints {
     @NotNull
     @Override
     public PlayerWaypoints getWaypoints(UUID player) {
-        return new PlayerWaypointsImpl(this, player);
+        return new ServerPlayerWaypointsImpl(this, player);
     }
 }
