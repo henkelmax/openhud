@@ -1,1 +1,1 @@
-- Added client-side API
+- Added client-side utils
