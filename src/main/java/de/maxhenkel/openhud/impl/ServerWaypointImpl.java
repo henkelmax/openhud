@@ -122,7 +122,14 @@ public class ServerWaypointImpl implements Waypoint {
                 waypoint.setPosition(position.value());
             }
             if (name != null) {
-                waypoint.setName(name.value());
+                Component nameValue = name.value();
+                if (nameValue.getString().isBlank()) {
+                    throw new IllegalStateException("Waypoint name cannot be empty");
+                }
+                if (nameValue.getString().length() > de.maxhenkel.openhud.waypoints.Waypoint.MAX_WAYPOINT_NAME_LENGTH) {
+                    throw new IllegalStateException("Waypoint name cannot exceed %s characters".formatted(de.maxhenkel.openhud.waypoints.Waypoint.MAX_WAYPOINT_NAME_LENGTH));
+                }
+                waypoint.setName(nameValue);
             }
             if (icon != null) {
                 waypoint.setIcon(icon.value());

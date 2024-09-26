@@ -1,6 +1,7 @@
 package de.maxhenkel.openhud.waypoints;
 
 import com.mojang.serialization.Codec;
+import de.maxhenkel.openhud.screen.ColorPicker;
 import de.maxhenkel.openhud.utils.CodecUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public class Waypoint implements Comparable<Waypoint> {
@@ -66,8 +68,12 @@ public class Waypoint implements Comparable<Waypoint> {
         this.readOnly = readOnly;
     }
 
+    public Waypoint() {
+        this(UUID.randomUUID(), Component.empty());
+    }
+
     public Waypoint(UUID id, Component name) {
-        this(id, BlockPos.ZERO, name, (ResourceLocation) null, 0, true, false); //TODO Random value
+        this(id, BlockPos.ZERO, name, (ResourceLocation) null, randomColor(), true, false);
     }
 
     public Waypoint(UUID id, BlockPos position, Component name, Optional<ResourceLocation> icon, int color, boolean visible, boolean readOnly) {
@@ -176,6 +182,10 @@ public class Waypoint implements Comparable<Waypoint> {
         boolean visible = tag.getBoolean("visible");
         boolean readOnly = tag.getBoolean("read_only");
         return new Waypoint(id, position, name, icon, color, visible, readOnly);
+    }
+
+    public static int randomColor() {
+        return ColorPicker.getColor(new Random().nextFloat());
     }
 
 }

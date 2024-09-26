@@ -49,8 +49,13 @@ public class WaypointScreen extends Screen {
     protected Waypoint waypoint;
 
     public WaypointScreen(@Nullable Screen parent, @Nullable Waypoint waypoint) {
+        this(parent, waypoint, false);
+    }
+
+    public WaypointScreen(@Nullable Screen parent, @Nullable Waypoint waypoint, boolean newWaypoint) {
         super(TITLE);
         this.parent = parent;
+        this.newWaypoint = newWaypoint;
         if (waypoint == null) {
             minecraft = Minecraft.getInstance();
             newWaypoint = true;
@@ -58,7 +63,7 @@ public class WaypointScreen extends Screen {
                     UUID.randomUUID(),
                     minecraft.gameRenderer.getMainCamera().getBlockPosition(),
                     Component.empty(),
-                    ColorPicker.getColor(minecraft.level != null ? minecraft.level.random.nextFloat() : 0.5F),
+                    Waypoint.randomColor(),
                     true
             );
         }

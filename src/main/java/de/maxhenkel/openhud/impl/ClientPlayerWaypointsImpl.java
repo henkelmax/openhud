@@ -13,7 +13,9 @@ import java.util.stream.Stream;
 
 public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
 
-    public ClientPlayerWaypointsImpl() {
+    public static final ClientPlayerWaypointsImpl INSTANCE = new ClientPlayerWaypointsImpl();
+
+    private ClientPlayerWaypointsImpl() {
 
     }
 
