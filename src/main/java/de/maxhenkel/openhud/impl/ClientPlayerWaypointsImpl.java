@@ -5,6 +5,8 @@ import de.maxhenkel.openhud.api.Waypoint;
 import de.maxhenkel.openhud.net.DeleteWaypointPayload;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Optional;
@@ -36,7 +38,11 @@ public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
 
     @Override
     public boolean removeWaypoint(UUID waypointId) {
-        PacketDistributor.sendToServer(new DeleteWaypointPayload(waypointId));
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level == null) {
+            return false;
+        }
+        PacketDistributor.sendToServer(new DeleteWaypointPayload(waypointId, level.dimension()));
         return true;
     }
 
@@ -54,7 +60,10 @@ public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
                 waypoint.setReadOnly(false);
             }
             ClientWaypointImpl waypointImpl = new ClientWaypointImpl(waypoint);
-            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypointImpl.getWaypoint()));
+            ClientLevel level = Minecraft.getInstance().level;
+            if (level != null) {
+                PacketDistributor.sendToServer(new UpdateWaypointPayload(waypointImpl.getWaypoint(), level.dimension()));
+            }
             return waypointImpl;
         }
     }

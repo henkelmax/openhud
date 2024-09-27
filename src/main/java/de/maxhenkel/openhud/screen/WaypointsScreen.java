@@ -106,8 +106,10 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
         return super.mouseReleased(mouseX, mouseY, button) || waypointList.mouseReleased(mouseX, mouseY, button);
     }
 
-    public static void sendWaypointUpdate(Waypoint waypoint) {
-        PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
+    public void sendWaypointUpdate(Waypoint waypoint) {
+        if (minecraft.level != null) {
+            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, minecraft.level.dimension()));
+        }
     }
 
     @Override

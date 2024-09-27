@@ -2,6 +2,8 @@ package de.maxhenkel.openhud.impl;
 
 import de.maxhenkel.openhud.api.Waypoint;
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -91,7 +93,10 @@ public class ClientWaypointImpl implements Waypoint {
                 waypoint.setReadOnly(readOnly.value());
             }
 
-            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
+            ClientLevel level = Minecraft.getInstance().level;
+            if (level != null) {
+                PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, level.dimension()));
+            }
             return ClientWaypointImpl.this;
         }
     }

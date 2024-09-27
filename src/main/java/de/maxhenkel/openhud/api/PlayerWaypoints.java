@@ -16,7 +16,7 @@ public interface PlayerWaypoints {
      * Removes a waypoint by ID.
      *
      * @param waypointId the ID of the waypoint
-     * @return true if the waypoint was removed (This is always true client-side)
+     * @return true if the waypoint was removed
      */
     boolean removeWaypoint(UUID waypointId);
 
@@ -24,7 +24,7 @@ public interface PlayerWaypoints {
      * Removes a waypoint.
      *
      * @param waypoint the waypoint
-     * @return true if the waypoint was removed (This is always true client-side)
+     * @return true if the waypoint was removed
      */
     default boolean removeWaypoint(Waypoint waypoint) {
         return removeWaypoint(waypoint.getId());

@@ -56,7 +56,7 @@ public class WaypointServerManager extends SavedData {
     @Nullable
     public Waypoint addOrUpdateWaypoint(ServerPlayer player, Waypoint waypoint) {
         Waypoint oldWaypoint = getWaypoints(player).addOrUpdateWaypoint(waypoint);
-        PacketDistributor.sendToPlayer(player, new UpdateWaypointPayload(waypoint));
+        PacketDistributor.sendToPlayer(player, new UpdateWaypointPayload(waypoint, player.serverLevel().dimension()));
         setDirty();
         return oldWaypoint;
     }
@@ -71,7 +71,7 @@ public class WaypointServerManager extends SavedData {
     @Nullable
     public Waypoint removeWaypoint(ServerPlayer player, UUID waypointId) {
         Waypoint removed = getWaypoints(player).removeWaypoint(waypointId);
-        PacketDistributor.sendToPlayer(player, new DeleteWaypointPayload(waypointId));
+        PacketDistributor.sendToPlayer(player, new DeleteWaypointPayload(waypointId, player.serverLevel().dimension()));
         setDirty();
         return removed;
     }
@@ -132,7 +132,7 @@ public class WaypointServerManager extends SavedData {
     private static void updateWaypoints(ServerPlayer player) {
         WaypointServerManager manager = get(player.serverLevel());
         manager.getOptionalWaypoints(player).ifPresent(waypoints -> {
-            player.connection.send(new WaypointsPayload(waypoints));
+            player.connection.send(new WaypointsPayload(waypoints, player.serverLevel().dimension()));
         });
     }
 

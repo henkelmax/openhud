@@ -43,7 +43,9 @@ public class DeleteWaypointScreen extends Screen {
 
         LinearLayout linearlayout = LinearLayout.horizontal().spacing(4);
         linearlayout.addChild(Button.builder(CONFIRM, b -> {
-            PacketDistributor.sendToServer(new DeleteWaypointPayload(waypoint.getId()));
+            if (minecraft.level != null) {
+                PacketDistributor.sendToServer(new DeleteWaypointPayload(waypoint.getId(), minecraft.level.dimension()));
+            }
             onClose();
         }).width(98).build());
         linearlayout.addChild(Button.builder(CANCEL, b -> onClose()).width(98).build());

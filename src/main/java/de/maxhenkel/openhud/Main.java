@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 @Mod(Main.MODID)
 public class Main {
 
-    public static final int PROTOCOL_VERSION = 1;
+    public static final int PROTOCOL_VERSION = 2;
     public static final String MODID = "openhud";
 
     public static final Logger LOGGER = LogManager.getLogger(Main.MODID);

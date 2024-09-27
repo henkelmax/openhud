@@ -155,7 +155,9 @@ public class WaypointScreen extends Screen {
         waypoint.setColor(waypointColor.getColor());
         waypoint.setIcon(icon);
         waypoint.setVisible(visible.selected());
-        PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint));
+        if (minecraft.level != null) {
+            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, minecraft.level.dimension()));
+        }
     }
 
     private int parseCoordinate(EditBox editBox) {

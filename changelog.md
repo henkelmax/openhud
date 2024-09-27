@@ -1,1 +1,2 @@
 - Preserve translation keys when editing waypoints
+- Validate dimension when processing waypoints
