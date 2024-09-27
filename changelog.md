@@ -1,1 +1,1 @@
-- Added client-side utils
+- Preserve translation keys when editing waypoints
