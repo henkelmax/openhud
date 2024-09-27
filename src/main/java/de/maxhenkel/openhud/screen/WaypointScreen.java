@@ -147,7 +147,10 @@ public class WaypointScreen extends Screen {
     }
 
     private void updateWaypoint() {
-        waypoint.setName(Component.literal(waypointName.getValue().trim()));
+        String newName = waypointName.getValue();
+        if (!waypoint.getName().getString().equals(newName)) {
+            waypoint.setName(Component.literal(newName.trim()));
+        }
         waypoint.setPosition(new BlockPos(parseCoordinate(coordinateX), parseCoordinate(coordinateY), parseCoordinate(coordinateZ)));
         waypoint.setColor(waypointColor.getColor());
         waypoint.setIcon(icon);
