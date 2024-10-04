@@ -42,6 +42,8 @@
   "openhud.configuration.render_waypoint_names.tooltip": "If waypoint names should be rendered on the HUD",
   "openhud.configuration.render_cardinal_directions": "Render Cardinal Directions",
   "openhud.configuration.render_cardinal_directions.tooltip": "If cardinal directions should be rendered on the HUD",
+  "openhud.configuration.render_center_indicator": "Render Center Indicator",
+  "openhud.configuration.render_center_indicator.tooltip": "If an indicator should be rendered at the center of the HUD",
   "openhud.configuration.hud_fov": "Hud FOV",
   "openhud.configuration.hud_fov.tooltip": "The FOV of the HUD",
   "openhud.configuration.hud_width": "HUD Width",

@@ -1,2 +1,1 @@
-- Preserve translation keys when editing waypoints
-- Validate dimension when processing waypoints
+- Added center indicator option

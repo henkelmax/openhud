@@ -28,6 +28,7 @@ public class RadarRenderer {
 
     public static final ResourceLocation GENERIC_MARKER = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker.png");
     public static final ResourceLocation GENERIC_MARKER_OVERLAY = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/generic_marker_overlay.png");
+    public static final ResourceLocation CENTER_INDICATOR = ResourceLocation.fromNamespaceAndPath(Main.MODID, "textures/hud/center_indicator.png");
     public static final int MARKER_SIZE = 6;
     public static final int GENERIC_MARKER_TEXTURE_SIZE = 8;
 
@@ -66,6 +67,11 @@ public class RadarRenderer {
 
         int contentWidth = hudWidth - BOX_INNER_HORIZONTAL_PADDING * 2;
         int contentHeight = hudHeight;
+
+        if (Main.CLIENT_CONFIG.renderCenterIndicator.get()) {
+            GraphicsUtils.blit(guiGraphics, CENTER_INDICATOR, startX + hudWidth / 2F - 4F, startX + hudWidth / 2F + 4F, (float) startY, startY + 4F, 0F, 1F, 0F, 0.5F);
+            GraphicsUtils.blit(guiGraphics, CENTER_INDICATOR, startX + hudWidth / 2F - 4F, startX + hudWidth / 2F + 4F, startY + hudHeight - 4F, startY + hudHeight, 0F, 1F, 0.5F, 1F);
+        }
 
         if (Main.CLIENT_CONFIG.renderCardinalDirections.get()) {
             float south = calculateHudPosition(0F);
