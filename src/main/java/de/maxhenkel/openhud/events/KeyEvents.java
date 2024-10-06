@@ -2,14 +2,10 @@ package de.maxhenkel.openhud.events;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import de.maxhenkel.openhud.Main;
-import de.maxhenkel.openhud.api.OpenHud;
 import de.maxhenkel.openhud.screen.WaypointScreen;
 import de.maxhenkel.openhud.screen.WaypointsScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,10 +42,7 @@ public class KeyEvents {
             mc.setScreen(new WaypointsScreen(mc.screen));
         }
         if (CREATE_WAYPOINT.consumeClick()) {
-            //mc.setScreen(new WaypointScreen(mc.screen, null));
-            OpenHud.getClientWaypointManager().newWaypoint().name(Component.translatable("message.openhud.edit_waypoint.waypoint_name")).save();
-            Screen clientTest = OpenHud.getClientUtils().createWaypointScreen(null, builder -> builder.name(Component.literal("Client Test")).position(new BlockPos(123, 64, 456)));
-            mc.setScreen(clientTest);
+            mc.setScreen(new WaypointScreen(mc.screen, null));
         }
     }
 
