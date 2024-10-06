@@ -1,1 +1,1 @@
-- Added center indicator option
+- Added skull icon
