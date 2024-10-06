@@ -44,3 +44,4 @@ OpenHud.getServerWaypointManager(player.serverLevel())
 - Sharing waypoints
 - Commands
 - Better settings screen
+- Death waypoints
