@@ -67,7 +67,7 @@ public class NetworkEvents {
             Main.LOGGER.warn("Player {} tried to create/edit readonly waypoint {}", player.getName(), waypoint.getId());
             return;
         }
-        WaypointServerManager.get(player.serverLevel()).addOrUpdateWaypoint(player, waypoint);
+        waypointServerManager.addOrUpdateWaypoint(player, waypoint);
         context.reply(new UpdateWaypointPayload(waypoint, level.dimension()));
     }
 
