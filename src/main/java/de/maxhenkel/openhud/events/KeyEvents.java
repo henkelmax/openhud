@@ -39,10 +39,10 @@ public class KeyEvents {
             Main.CLIENT_CONFIG.hideHud.set(!Main.CLIENT_CONFIG.hideHud.get());
         }
         if (WAYPOINTS.consumeClick()) {
-            mc.setScreen(new WaypointsScreen(mc.screen));
+            mc.setScreen(new WaypointsScreen(mc.screen, null));
         }
         if (CREATE_WAYPOINT.consumeClick()) {
-            mc.setScreen(new WaypointScreen(mc.screen, null));
+            mc.setScreen(new WaypointScreen(mc.screen, null, null));
         }
     }
 

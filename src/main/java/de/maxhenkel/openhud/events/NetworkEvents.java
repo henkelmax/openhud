@@ -9,7 +9,6 @@ import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import de.maxhenkel.openhud.waypoints.WaypointServerManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -31,25 +30,25 @@ public class NetworkEvents {
     public static void register(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(String.valueOf(Main.PROTOCOL_VERSION));
         registrar.playToClient(WaypointsPayload.TYPE, WaypointsPayload.STREAM_CODEC, (payload, context) -> {
-            WaypointClientManager.updateWaypoints(payload.getPayload());
+            WaypointClientManager.updateWaypoints(payload.getDimension(), payload.getPayload());
         });
         registrar.playBidirectional(UpdateWaypointPayload.TYPE, UpdateWaypointPayload.STREAM_CODEC, (payload, context) -> {
             if (context.flow().equals(PacketFlow.CLIENTBOUND)) {
-                onUpdateClient(context, payload.getPayload(), payload.getDimension());
+                onUpdateClient(context, payload.getDimension(), payload.getPayload());
             } else {
-                onUpdateServer(context, payload.getPayload(), payload.getDimension());
+                onUpdateServer(context, payload.getDimension(), payload.getPayload());
             }
         });
         registrar.playBidirectional(DeleteWaypointPayload.TYPE, DeleteWaypointPayload.STREAM_CODEC, (payload, context) -> {
             if (context.flow().equals(PacketFlow.CLIENTBOUND)) {
-                onDeleteClient(context, payload.getPayload(), payload.getDimension());
+                onDeleteClient(context, payload.getDimension(), payload.getPayload());
             } else {
-                onDeleteServer(context, payload.getPayload(), payload.getDimension());
+                onDeleteServer(context, payload.getDimension(), payload.getPayload());
             }
         });
     }
 
-    private static void onUpdateServer(IPayloadContext context, Waypoint waypoint, ResourceKey<Level> dimension) {
+    private static void onUpdateServer(IPayloadContext context, ResourceKey<Level> dimension, Waypoint waypoint) {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
@@ -73,16 +72,12 @@ public class NetworkEvents {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static void onUpdateClient(IPayloadContext context, Waypoint waypoint, ResourceKey<Level> dimension) {
-        if (!isValidDimension(dimension)) {
-            Main.LOGGER.warn("Received waypoint with invalid dimension {}", dimension);
-            return;
-        }
-        WaypointClientManager.getWaypoints().addOrUpdateWaypoint(waypoint);
+    private static void onUpdateClient(IPayloadContext context, ResourceKey<Level> dimension, Waypoint waypoint) {
+        WaypointClientManager.getWaypoints(dimension).addOrUpdateWaypoint(waypoint);
         checkUpdateScreens();
     }
 
-    private static void onDeleteServer(IPayloadContext context, UUID waypointId, ResourceKey<Level> dimension) {
+    private static void onDeleteServer(IPayloadContext context, ResourceKey<Level> dimension, UUID waypointId) {
         if (!(context.player() instanceof ServerPlayer player)) {
             return;
         }
@@ -101,34 +96,14 @@ public class NetworkEvents {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static void onDeleteClient(IPayloadContext context, UUID waypointId, ResourceKey<Level> dimension) {
-        if (!isValidDimension(dimension)) {
-            Main.LOGGER.warn("Received waypoint update with invalid dimension {}", dimension);
-            return;
-        }
-        WaypointClientManager.getWaypoints().removeWaypoint(waypointId);
+    private static void onDeleteClient(IPayloadContext context, ResourceKey<Level> dimension, UUID waypointId) {
+        WaypointClientManager.getWaypoints(dimension).removeWaypoint(waypointId);
         checkUpdateScreens();
     }
 
     @Nullable
     private static ServerLevel get(ServerPlayer player, ResourceKey<Level> dimension) {
-        ServerLevel level = player.serverLevel().getServer().getLevel(dimension);
-        if (level == null) {
-            return null;
-        }
-        return level;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static boolean isValidDimension(ResourceKey<Level> dimension) {
-        ClientLevel level = Minecraft.getInstance().level;
-        if (level == null) {
-            return false;
-        }
-        if (!dimension.equals(level.dimension())) {
-            return false;
-        }
-        return true;
+        return player.serverLevel().getServer().getLevel(dimension);
     }
 
     @OnlyIn(Dist.CLIENT)

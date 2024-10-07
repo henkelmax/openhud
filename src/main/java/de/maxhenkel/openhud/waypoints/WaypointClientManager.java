@@ -1,6 +1,10 @@
 package de.maxhenkel.openhud.waypoints;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -8,24 +12,37 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(Dist.CLIENT)
 public class WaypointClientManager {
 
+    public static final ResourceKey<Level> OVERWORLD = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld"));
+
     private static final Minecraft mc = Minecraft.getInstance();
 
-    private static PlayerWaypoints waypoints = new PlayerWaypoints();
+    private static final Map<ResourceKey<Level>, PlayerWaypoints> waypoints = new HashMap<>();
 
-    public WaypointClientManager() {
-        waypoints = new PlayerWaypoints();
+    private WaypointClientManager() {
+
     }
 
-    public static void updateWaypoints(PlayerWaypoints wp) {
-        waypoints = wp;
+    public static ResourceKey<Level> getFallback() {
+        if (mc.level == null) {
+            return OVERWORLD;
+        } else {
+            return mc.level.dimension();
+        }
     }
 
-    public static PlayerWaypoints getWaypoints() {
-        return waypoints;
+    public static void updateWaypoints(ResourceKey<Level> dimension, PlayerWaypoints wp) {
+        waypoints.put(dimension, wp);
+    }
+
+    public static PlayerWaypoints getWaypoints(ResourceKey<Level> dimension) {
+        return waypoints.computeIfAbsent(dimension, resourceKey -> new PlayerWaypoints());
     }
 
     @SubscribeEvent
@@ -41,7 +58,7 @@ public class WaypointClientManager {
     }
 
     private static void clear() {
-        waypoints = new PlayerWaypoints();
+        waypoints.clear();
     }
 
 }

@@ -5,6 +5,8 @@ import de.maxhenkel.openhud.api.Waypoint;
 import de.maxhenkel.openhud.screen.WaypointScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -18,7 +20,7 @@ public class ClientUtilsImpl implements ClientUtils {
     }
 
     @Override
-    public Screen createWaypointScreen(@Nullable Screen parent, Function<Waypoint.Builder, Waypoint.Builder> waypointBuilder) {
+    public Screen createWaypointScreen(@Nullable Screen parent, @Nullable ResourceKey<Level> dimension, Function<Waypoint.Builder, Waypoint.Builder> waypointBuilder) {
         ScreenEditorBuilderImpl b = new ScreenEditorBuilderImpl();
         Waypoint.Builder result = waypointBuilder.apply(b);
         if (result != b) {
@@ -48,7 +50,7 @@ public class ClientUtilsImpl implements ClientUtils {
         if (b.visible != null) {
             waypoint.setVisible(b.visible.value());
         }
-        return new WaypointScreen(parent, waypoint);
+        return new WaypointScreen(parent, dimension, waypoint);
     }
 
     private static class ScreenEditorBuilderImpl extends ServerWaypointImpl.EditorBuilderImpl {

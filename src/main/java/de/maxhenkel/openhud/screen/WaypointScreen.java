@@ -2,6 +2,7 @@ package de.maxhenkel.openhud.screen;
 
 import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.waypoints.Waypoint;
+import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,7 +14,9 @@ import net.minecraft.client.gui.layouts.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -35,6 +38,8 @@ public class WaypointScreen extends Screen {
 
     @Nullable
     protected Screen parent;
+    protected ResourceKey<Level> dimension;
+
     protected EditBox waypointName;
     protected EditBox coordinateX;
     protected EditBox coordinateY;
@@ -48,13 +53,18 @@ public class WaypointScreen extends Screen {
     protected boolean newWaypoint;
     protected Waypoint waypoint;
 
-    public WaypointScreen(@Nullable Screen parent, @Nullable Waypoint waypoint) {
-        this(parent, waypoint, false);
+    public WaypointScreen(@Nullable Screen parent, @Nullable ResourceKey<Level> dimension, @Nullable Waypoint waypoint) {
+        this(parent, dimension, waypoint, false);
     }
 
-    public WaypointScreen(@Nullable Screen parent, @Nullable Waypoint waypoint, boolean newWaypoint) {
+    public WaypointScreen(@Nullable Screen parent, @Nullable ResourceKey<Level> dimension, @Nullable Waypoint waypoint, boolean newWaypoint) {
         super(TITLE);
         this.parent = parent;
+        if (dimension == null) {
+            this.dimension = WaypointClientManager.getFallback();
+        } else {
+            this.dimension = dimension;
+        }
         this.newWaypoint = newWaypoint;
         if (waypoint == null) {
             minecraft = Minecraft.getInstance();
@@ -155,9 +165,7 @@ public class WaypointScreen extends Screen {
         waypoint.setColor(waypointColor.getColor());
         waypoint.setIcon(icon);
         waypoint.setVisible(visible.selected());
-        if (minecraft.level != null) {
-            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, minecraft.level.dimension()));
-        }
+        PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, dimension));
     }
 
     private int parseCoordinate(EditBox editBox) {

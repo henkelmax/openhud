@@ -6,6 +6,7 @@ import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.utils.GraphicsUtils;
 import de.maxhenkel.openhud.waypoints.Waypoint;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -13,7 +14,9 @@ import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -41,12 +44,19 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     @Nullable
     protected final Screen parent;
+    protected ResourceKey<Level> dimension;
     protected CycleButton<SortOrder> sortOrder;
     protected WaypointList waypointList;
 
-    public WaypointsScreen(@Nullable Screen parent) {
+    public WaypointsScreen(@Nullable Screen parent, @Nullable ResourceKey<Level> dimension) {
         super(TITLE);
+        this.minecraft = Minecraft.getInstance();
         this.parent = parent;
+        if (dimension == null) {
+            this.dimension = WaypointClientManager.getFallback();
+        } else {
+            this.dimension = dimension;
+        }
     }
 
     @Override
@@ -72,7 +82,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
         addRenderableWidget(waypointList);
 
         addRenderableWidget(Button.builder(CREATE, button -> {
-            minecraft.setScreen(new WaypointScreen(this, null));
+            minecraft.setScreen(new WaypointScreen(this, dimension, null));
         }).bounds(width / 2 - 100 - 5, height - FOOTER_SIZE / 2 - 10, 100, 20).build());
 
         addRenderableWidget(Button.builder(BACK, button -> {
@@ -108,7 +118,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     public void sendWaypointUpdate(Waypoint waypoint) {
         if (minecraft.level != null) {
-            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, minecraft.level.dimension()));
+            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, dimension));
         }
     }
 
@@ -128,7 +138,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
             clearEntries();
             setSelected(null);
 
-            List<Waypoint> waypointsList = sortOrder.getValue().sort(WaypointClientManager.getWaypoints().createWaypointsList());
+            List<Waypoint> waypointsList = sortOrder.getValue().sort(WaypointClientManager.getWaypoints(dimension).createWaypointsList());
             for (Waypoint waypoint : waypointsList) {
                 addEntry(new Entry(waypoint));
             }
@@ -166,7 +176,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                 children.add(visible);
 
                 edit = SpriteIconButton.builder(EDIT, button -> {
-                            minecraft.setScreen(new WaypointScreen(WaypointsScreen.this, waypoint));
+                            minecraft.setScreen(new WaypointScreen(WaypointsScreen.this, dimension, waypoint));
                         }, true)
                         .width(20)
                         .sprite(EDIT_ICON, 16, 16)
@@ -174,7 +184,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                 children.add(edit);
                 edit.active = !waypoint.isReadOnly();
                 delete = SpriteIconButton.builder(DELETE, button -> {
-                            minecraft.setScreen(new DeleteWaypointScreen(WaypointsScreen.this, waypoint));
+                            minecraft.setScreen(new DeleteWaypointScreen(WaypointsScreen.this, dimension, waypoint));
                         }, true)
                         .width(20)
                         .sprite(DELETE_ICON, 16, 16)

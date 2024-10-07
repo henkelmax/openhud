@@ -47,7 +47,7 @@ public class RadarRenderer {
 
     public static void render(GuiGraphics guiGraphics) {
         updatePulseFactor();
-        if (mc.player == null) {
+        if (mc.player == null || mc.level == null) {
             return;
         }
         guiGraphics.pose().pushPose();
@@ -97,7 +97,7 @@ public class RadarRenderer {
         }
 
         Vec3 worldPosition = mc.gameRenderer.getMainCamera().getPosition().multiply(1D, 0D, 1D);
-        List<Waypoint> waypointsList = WaypointClientManager.getWaypoints().createWaypointsList();
+        List<Waypoint> waypointsList = WaypointClientManager.getWaypoints(mc.level.dimension()).createWaypointsList();
         waypointsList.sort(DISTANCE_COMPARATOR);
 
         Waypoint displayWaypoint = null;

@@ -7,28 +7,41 @@ import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.waypoints.WaypointClientManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
 
-    public static final ClientPlayerWaypointsImpl INSTANCE = new ClientPlayerWaypointsImpl();
+    private static final Map<ResourceKey<Level>, ClientPlayerWaypointsImpl> INSTANCES = new HashMap<>();
 
-    private ClientPlayerWaypointsImpl() {
+    public static ClientPlayerWaypointsImpl get(ResourceKey<Level> dimension) {
+        if (dimension == null) {
+            dimension = WaypointClientManager.getFallback();
+        }
+        return INSTANCES.computeIfAbsent(dimension, ClientPlayerWaypointsImpl::new);
+    }
 
+    private final ResourceKey<Level> dimension;
+
+    private ClientPlayerWaypointsImpl(ResourceKey<Level> dimension) {
+        this.dimension = dimension;
     }
 
     @Override
     public Stream<Waypoint> getWaypoints() {
-        return WaypointClientManager.getWaypoints().getWaypoints().stream().map(ClientWaypointImpl::new);
+        return WaypointClientManager.getWaypoints(dimension).getWaypoints().stream().map(ClientWaypointImpl::new);
     }
 
     @Override
     public Optional<Waypoint> getById(UUID id) {
-        return WaypointClientManager.getWaypoints().getById(id).map(ClientWaypointImpl::new);
+        return WaypointClientManager.getWaypoints(dimension).getById(id).map(ClientWaypointImpl::new);
     }
 
     @Override

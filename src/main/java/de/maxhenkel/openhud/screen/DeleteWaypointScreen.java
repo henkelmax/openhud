@@ -12,6 +12,8 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -24,11 +26,13 @@ public class DeleteWaypointScreen extends Screen {
 
     @Nullable
     protected Screen parent;
+    protected ResourceKey<Level> dimension;
     protected Waypoint waypoint;
 
-    public DeleteWaypointScreen(@Nullable Screen parent, Waypoint waypoint) {
+    public DeleteWaypointScreen(@Nullable Screen parent, ResourceKey<Level> dimension, Waypoint waypoint) {
         super(TITLE);
         this.parent = parent;
+        this.dimension = dimension;
         this.waypoint = waypoint;
     }
 
@@ -43,9 +47,7 @@ public class DeleteWaypointScreen extends Screen {
 
         LinearLayout linearlayout = LinearLayout.horizontal().spacing(4);
         linearlayout.addChild(Button.builder(CONFIRM, b -> {
-            if (minecraft.level != null) {
-                PacketDistributor.sendToServer(new DeleteWaypointPayload(waypoint.getId(), minecraft.level.dimension()));
-            }
+            PacketDistributor.sendToServer(new DeleteWaypointPayload(waypoint.getId(), dimension));
             onClose();
         }).width(98).build());
         linearlayout.addChild(Button.builder(CANCEL, b -> onClose()).width(98).build());
