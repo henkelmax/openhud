@@ -1,1 +1,1 @@
-- Added skull icon
+- Added support for adding client side waypoints for other dimensions
