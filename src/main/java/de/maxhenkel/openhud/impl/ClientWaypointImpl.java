@@ -6,7 +6,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -14,9 +16,11 @@ import java.util.UUID;
 
 public class ClientWaypointImpl implements Waypoint {
 
+    protected ResourceKey<Level> dimension;
     protected de.maxhenkel.openhud.waypoints.Waypoint waypoint;
 
-    public ClientWaypointImpl(de.maxhenkel.openhud.waypoints.Waypoint waypoint) {
+    public ClientWaypointImpl(ResourceKey<Level> dimension, de.maxhenkel.openhud.waypoints.Waypoint waypoint) {
+        this.dimension = dimension;
         this.waypoint = waypoint;
     }
 
@@ -93,10 +97,7 @@ public class ClientWaypointImpl implements Waypoint {
                 waypoint.setReadOnly(readOnly.value());
             }
 
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, level.dimension()));
-            }
+            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypoint, dimension));
             return ClientWaypointImpl.this;
         }
     }

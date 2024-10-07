@@ -36,12 +36,12 @@ public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
 
     @Override
     public Stream<Waypoint> getWaypoints() {
-        return WaypointClientManager.getWaypoints(dimension).getWaypoints().stream().map(ClientWaypointImpl::new);
+        return WaypointClientManager.getWaypoints(dimension).getWaypoints().stream().map(waypoint -> new ClientWaypointImpl(dimension, waypoint));
     }
 
     @Override
     public Optional<Waypoint> getById(UUID id) {
-        return WaypointClientManager.getWaypoints(dimension).getById(id).map(ClientWaypointImpl::new);
+        return WaypointClientManager.getWaypoints(dimension).getById(id).map(waypoint -> new ClientWaypointImpl(dimension, waypoint));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
         return true;
     }
 
-    private static class CreateServerBuilderImpl extends ServerPlayerWaypointsImpl.CreateBuilderImpl {
+    private class CreateServerBuilderImpl extends ServerPlayerWaypointsImpl.CreateBuilderImpl {
 
         @Override
         public Waypoint.Builder readOnly(boolean readOnly) {
@@ -72,11 +72,8 @@ public class ClientPlayerWaypointsImpl implements PlayerWaypoints {
             if (waypoint.isReadOnly()) {
                 waypoint.setReadOnly(false);
             }
-            ClientWaypointImpl waypointImpl = new ClientWaypointImpl(waypoint);
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                PacketDistributor.sendToServer(new UpdateWaypointPayload(waypointImpl.getWaypoint(), level.dimension()));
-            }
+            ClientWaypointImpl waypointImpl = new ClientWaypointImpl(dimension, waypoint);
+            PacketDistributor.sendToServer(new UpdateWaypointPayload(waypointImpl.getWaypoint(), dimension));
             return waypointImpl;
         }
     }

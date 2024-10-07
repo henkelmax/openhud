@@ -6,8 +6,10 @@ import de.maxhenkel.openhud.net.UpdateWaypointPayload;
 import de.maxhenkel.openhud.net.WaypointsPayload;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,13 +27,11 @@ import java.util.UUID;
 @EventBusSubscriber
 public class WaypointServerManager extends SavedData {
 
+    private final ResourceKey<Level> dimension;
     private final Map<UUID, PlayerWaypoints> waypoints;
 
-    public WaypointServerManager(Map<UUID, PlayerWaypoints> waypoints) {
-        this.waypoints = waypoints;
-    }
-
-    public WaypointServerManager() {
+    public WaypointServerManager(ResourceKey<Level> dimension) {
+        this.dimension = dimension;
         this.waypoints = new HashMap<>();
     }
 
@@ -56,7 +56,7 @@ public class WaypointServerManager extends SavedData {
     @Nullable
     public Waypoint addOrUpdateWaypoint(ServerPlayer player, Waypoint waypoint) {
         Waypoint oldWaypoint = getWaypoints(player).addOrUpdateWaypoint(waypoint);
-        PacketDistributor.sendToPlayer(player, new UpdateWaypointPayload(waypoint, player.serverLevel().dimension()));
+        PacketDistributor.sendToPlayer(player, new UpdateWaypointPayload(waypoint, dimension));
         setDirty();
         return oldWaypoint;
     }
@@ -71,7 +71,7 @@ public class WaypointServerManager extends SavedData {
     @Nullable
     public Waypoint removeWaypoint(ServerPlayer player, UUID waypointId) {
         Waypoint removed = getWaypoints(player).removeWaypoint(waypointId);
-        PacketDistributor.sendToPlayer(player, new DeleteWaypointPayload(waypointId, player.serverLevel().dimension()));
+        PacketDistributor.sendToPlayer(player, new DeleteWaypointPayload(waypointId, dimension));
         setDirty();
         return removed;
     }
@@ -92,8 +92,8 @@ public class WaypointServerManager extends SavedData {
         return compound;
     }
 
-    public static WaypointServerManager load(CompoundTag compound, HolderLookup.Provider provider) {
-        WaypointServerManager manager = new WaypointServerManager();
+    public static WaypointServerManager load(ServerLevel level, CompoundTag compound, HolderLookup.Provider provider) {
+        WaypointServerManager manager = new WaypointServerManager(level.dimension());
         CompoundTag waypointsTag = compound.getCompound("waypoints");
 
         for (String key : waypointsTag.getAllKeys()) {
@@ -110,7 +110,7 @@ public class WaypointServerManager extends SavedData {
     }
 
     public static WaypointServerManager get(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(new SavedData.Factory<>(WaypointServerManager::new, WaypointServerManager::load), "openhud_waypoints");
+        return serverLevel.getDataStorage().computeIfAbsent(new SavedData.Factory<>(() -> new WaypointServerManager(serverLevel.dimension()), (compound, provider) -> load(serverLevel, compound, provider)), "openhud_waypoints");
     }
 
     @SubscribeEvent
