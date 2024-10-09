@@ -25,11 +25,11 @@ public class KeyEvents {
     public static KeyMapping CREATE_WAYPOINT;
 
     public static void onRegisterKeyBinds(RegisterKeyMappingsEvent event) {
-        HIDE_HUD = new KeyMapping("key.openhud.hide_hud", InputConstants.UNKNOWN.getValue(), "key.categories.misc");
+        HIDE_HUD = new KeyMapping("key.openhud.hide_hud", InputConstants.UNKNOWN.getValue(), "key.categories.openhud");
         event.register(HIDE_HUD);
-        WAYPOINTS = new KeyMapping("key.openhud.waypoints", GLFW.GLFW_KEY_M, "key.categories.misc");
+        WAYPOINTS = new KeyMapping("key.openhud.waypoints", GLFW.GLFW_KEY_M, "key.categories.openhud");
         event.register(WAYPOINTS);
-        CREATE_WAYPOINT = new KeyMapping("key.openhud.create_waypoint", InputConstants.UNKNOWN.getValue(), "key.categories.misc");
+        CREATE_WAYPOINT = new KeyMapping("key.openhud.create_waypoint", InputConstants.UNKNOWN.getValue(), "key.categories.openhud");
         event.register(CREATE_WAYPOINT);
     }
 
@@ -37,6 +37,7 @@ public class KeyEvents {
     public static void onKeyInput(InputEvent.Key event) {
         if (HIDE_HUD.consumeClick()) {
             Main.CLIENT_CONFIG.hideHud.set(!Main.CLIENT_CONFIG.hideHud.get());
+            Main.CLIENT_CONFIG.hideHud.save();
         }
         if (WAYPOINTS.consumeClick()) {
             mc.setScreen(new WaypointsScreen(mc.screen, null));

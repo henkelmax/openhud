@@ -1,4 +1,5 @@
 {
+  "key.categories.openhud": "OpenHUD",
   "key.openhud.waypoints": "Manage Waypoints",
   "key.openhud.hide_hud": "Hide HUD",
   "key.openhud.create_waypoint": "Create Waypoint",
