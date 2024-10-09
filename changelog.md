@@ -1,1 +1,2 @@
-- Added support for adding client side waypoints for other dimensions
+- Added OpenHUD key category
+- Fixed hiding the HUD not saving
